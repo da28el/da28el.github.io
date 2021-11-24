@@ -7,6 +7,8 @@
 </head>
 <body>
     <h2>throw me a ray ;)</h2>
-    <canvas width="480" height="480" class="img" onmousemove="moveSource(event)">:(</canvas>
+    <canvas width="480" height="480" class="img" onmousemove="moveSource(event)" onmousedown="startBoundry(event)" onmouseup="endBoundry(event)">:(</canvas>
+    <h3>#Rays</h3>
+    <input type="range" min="45" max="360" value="90" class="slider" id="range">
     <script src="raycast.js"></script>
 </body>
