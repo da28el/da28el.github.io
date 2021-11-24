@@ -59,10 +59,12 @@ function random(min, max) {
 }
 var balls = [];
 addBall();
+var ballCount = document.getElementById("ballcount");
 function addBall() {
     var size = random(10, 20);
     var ball = new Ball(new vec2(random(size, width - size), random(size, height - size)), new vec2(random(-7, 7), random(-7, 7)), "rgb(" + random(0, 255) + "," + random(0, 255) + "," + random(0, 255) + ")", size);
     balls.push(ball);
+    ballCount.innerHTML = "#" + balls.length;
 }
 var theta = 0;
 function loop() {
@@ -98,4 +100,4 @@ const strPoint = (p: Point) => {
 
 const point = getPoint(1);
 console.log(strPoint(point).toLocaleUpperCase());
-*/ 
+*/
