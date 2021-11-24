@@ -83,9 +83,11 @@ function addBall(){
 }
 
 let theta = 0;
+const ballCount = document.getElementById("ballcount");
 
 function loop(){
     theta += 0.01;
+    ballCount.innerHTML = `#${balls.length}`
     ctx.fillStyle = `rgba(${255*Math.sin(theta)},${255*Math.cos(theta)},${255*Math.tan(theta)}, 0.25)`;
     ctx.fillRect(0,0,width,height);
     for(let i = 0; i < balls.length; i++){
