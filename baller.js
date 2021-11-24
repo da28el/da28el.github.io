@@ -60,7 +60,7 @@ function random(min, max) {
 var balls = [];
 addBall();
 var ballCount = document.createElement("h3");
-document.append(ballCount);
+document.body.append(ballCount);
 function addBall() {
     ballCount.innerHTML = "#" + balls.length;
     var size = random(10, 20);
