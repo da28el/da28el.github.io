@@ -1,3 +1,4 @@
+// Objects
 var vec2 = /** @class */ (function () {
     function vec2(x, y) {
         if (x === void 0) { x = 0; }
@@ -15,6 +16,9 @@ var vec2 = /** @class */ (function () {
     };
     vec2.prototype.str = function () {
         return "(" + this.x + ", " + this.y + ") - |" + this.length() + "|";
+    };
+    vec2.prototype.copy = function () {
+        return new vec2(this.x, this.y);
     };
     vec2.add = function (v1, v2) {
         return new vec2(v1.x + v2.x, v1.y + v2.y);
@@ -73,28 +77,32 @@ var source = /** @class */ (function () {
     function source(p) {
         this.rays = [];
         this.pos = p;
-        this.cast();
+        this.dir = new vec2();
     }
-    source.prototype.cast = function () {
-        for (var i = 0; i < 180; i++)
-            this.rays.push(new ray(this.pos, vec2.fromAngle(2 * i)));
+    source.prototype.cast = function (n) {
+        var a = Math.round(360 / n);
+        for (var i = 0; i < n; i++)
+            this.rays.push(new ray(this.pos, vec2.fromAngle(a * i)));
     };
     return source;
 }());
+// DOM
 var canvas = document.querySelector('canvas');
 var ctx = canvas.getContext('2d');
+var raycount = document.getElementById("range");
 var width = canvas.width; // = window.innerWidth;
 var height = canvas.height; // = window.innerHeight;
 var s = new source(new vec2(width / 2, height / 2));
 var boundries = [];
-boundries.push(new boundry(new vec2(10, 70), new vec2(80, 40)));
-boundries.push(new boundry(new vec2(15, 60), new vec2(280, 70)));
-boundries.push(new boundry(new vec2(40, 100), new vec2(70, 280)));
-boundries.push(new boundry(new vec2(280, 400), new vec2(400, 270)));
+// Edge boundries
+boundries.push(new boundry(new vec2(0, 0), new vec2(width, 0)));
+boundries.push(new boundry(new vec2(0, 0), new vec2(0, height)));
+boundries.push(new boundry(new vec2(width, 0), new vec2(width, height)));
+boundries.push(new boundry(new vec2(0, height), new vec2(width, height)));
 function paint() {
     ctx.fillStyle = 'rgb(0,0,0)';
     ctx.fillRect(0, 0, width, height);
-    s.cast();
+    s.cast(+raycount.value);
     for (var j = 0; j < boundries.length; j++) {
         ctx.strokeStyle = 'rgb(255,0,0)';
         ctx.lineWidth = 2;
@@ -118,6 +126,26 @@ function paint() {
         ctx.stroke();
     }
 }
+function paint3d() {
+    ctx.fillStyle = 'rgb(0,0,0)';
+    ctx.fillRect(0, 0, width, height);
+    s.cast(+raycount.value);
+    for (var i = 0; i < s.rays.length; i++) {
+        var nearest = vec2.scale(new vec2(2, 2), ray.max_dist + 1);
+        for (var j = 0; j < boundries.length; j++) {
+            var z = s.rays[i].collision(boundries[j]);
+            if (vec2.sub(s.pos, z).length() < vec2.sub(s.pos, nearest).length())
+                nearest = z;
+        }
+        var l = nearest.length() / 1000;
+        ctx.strokeStyle = 'rgb(255,255,255)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(i * width / s.rays.length, height / 2 + 1 / l);
+        ctx.lineTo(i * width / s.rays.length, height / 2 - 1 / l);
+        ctx.stroke();
+    }
+}
 function getMousePos(canvas, evt) {
     var rect = canvas.getBoundingClientRect();
     return {
@@ -131,4 +159,13 @@ function moveSource(evt) {
     s.pos.y = pos.y;
     paint();
 }
-paint();
+var bp1 = new vec2();
+function startBoundry(evt) {
+    var pos = getMousePos(canvas, evt);
+    bp1.set(pos.x, pos.y);
+}
+function endBoundry(evt) {
+    var pos = getMousePos(canvas, evt);
+    boundries.push(new boundry(bp1.copy(), new vec2(pos.x, pos.y)));
+}
+paint3d();
