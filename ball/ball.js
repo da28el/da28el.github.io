@@ -62,16 +62,15 @@ addBall();
 var ballCount = document.createElement("h3");
 document.body.append(ballCount);
 function addBall() {
-    ballCount.innerHTML = "#" + balls.length;
     var size = random(10, 20);
     var ball = new Ball(new vec2(random(size, width - size), random(size, height - size)), new vec2(random(-7, 7), random(-7, 7)), "rgb(" + random(0, 255) + "," + random(0, 255) + "," + random(0, 255) + ")", size);
     balls.push(ball);
-    ballCount.innerHTML = "#" + balls.length;
 }
 var theta = 0;
 function loop() {
     theta += 0.01;
-    ctx.fillStyle = "rgba(" + 255 * Math.sin(theta) + "," + 255 * Math.cos(theta) + "," + 255 * Math.tan(theta) + ", 0.25)";
+    ballCount.innerHTML = "#" + balls.length;
+    ctx.fillStyle = "rgba(" + 255 * Math.abs(Math.sin(theta)) + "," + 255 * Math.abs(Math.cos(0.5 * theta)) + "," + 255 * Math.abs(Math.tan(theta)) + ", 0.25)";
     ctx.fillRect(0, 0, width, height);
     for (var i = 0; i < balls.length; i++) {
         balls[i].draw();
@@ -80,26 +79,3 @@ function loop() {
     requestAnimationFrame(loop);
 }
 loop();
-/*
-interface Point{
-    id: number,
-    name: string,
-    x: number,
-    y:number
-};
-
-function getPoint(id: number): Point{
-    return {
-        id: id,
-        name: `P${id}`,
-        x: 10.0,
-        y: 20.0
-    }
-}
-const strPoint = (p: Point) => {
-    return `Point ${point.name} - x: ${point.x}, y: ${point.y}`;
-}
-
-const point = getPoint(1);
-console.log(strPoint(point).toLocaleUpperCase());
-*/
