@@ -1,4 +1,4 @@
-    var vec2 = /** @class */ (function () {
+var vec2 = /** @class */ (function () {
     function vec2(x, y) {
         if (x === void 0) { x = 0; }
         if (y === void 0) { y = 0; }
