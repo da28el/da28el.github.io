@@ -59,8 +59,9 @@ function random(min, max) {
 }
 var balls = [];
 addBall();
-var ballCount = document.getElementById("ballcount");
+var ballCount = document.createElement("h3");
 function addBall() {
+    ballCount.innerHTML = "#" + balls.length;
     var size = random(10, 20);
     var ball = new Ball(new vec2(random(size, width - size), random(size, height - size)), new vec2(random(-7, 7), random(-7, 7)), "rgb(" + random(0, 255) + "," + random(0, 255) + "," + random(0, 255) + ")", size);
     balls.push(ball);
