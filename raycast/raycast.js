@@ -102,6 +102,7 @@ boundries.push(new boundry(new vec2(0, height), new vec2(width, height)));
 function paint() {
     ctx.fillStyle = 'rgb(0,0,0)';
     ctx.fillRect(0, 0, width, height);
+    s.rays = [];
     s.cast(+raycount.value);
     for (var j = 0; j < boundries.length; j++) {
         ctx.strokeStyle = 'rgb(255,0,0)';
