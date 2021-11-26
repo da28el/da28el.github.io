@@ -16,6 +16,13 @@ function startDraw() {
 function stopDraw() {
     paint = false;
 }
+function updateColor() {
+    color = colorPicker.value;
+}
+function updateSize() {
+    size = +slider.value;
+    sizeIndicator.innerHTML = "#" + size;
+}
 function getMousePos(canvas, evt) {
     var rect = canvas.getBoundingClientRect();
     return {
@@ -24,14 +31,18 @@ function getMousePos(canvas, evt) {
     };
 }
 function draw(evt) {
-    size = +slider.value;
-    sizeIndicator.innerHTML = "#" + size;
-    color = colorPicker.value;
+    updateSize();
+    updateColor();
     if (paint) {
         var pos = getMousePos(canvas, evt);
         ctx.fillStyle = color;
         ctx.fillRect(pos.x, pos.y, size, size);
     }
+}
+function fill() {
+    updateColor();
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, width, height);
 }
 /*
 
