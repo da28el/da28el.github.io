@@ -3,6 +3,7 @@ var vec2 = /** @class */ (function () {
         var _this = this;
         if (x === void 0) { x = 0; }
         if (y === void 0) { y = 0; }
+        this.copy = function () { return new vec2(_this.x, _this.y); };
         this.str = function () { return "(" + _this.x + "," + _this.y + ")"; };
         this.x = x;
         this.y = y;
@@ -82,6 +83,7 @@ var asteroid = new body(new vec2(245, 0), new vec2(0, 25), 5, '#808080');
 bodies.push(earth);
 bodies.push(moon);
 bodies.push(asteroid);
+var traces = [];
 function paint() {
     ctx.lineWidth = 1;
     ctx.fillStyle = "#000000";
@@ -89,6 +91,10 @@ function paint() {
 }
 function loop() {
     paint();
+    for (var i = 0; i < traces.length; i++) {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(traces[i].x + xoffset, traces[i].y + yoffset, 1, 1);
+    }
     for (var i = 0; i < bodies.length; i++) {
         bodies[i].draw();
         for (var j = 0; j < bodies.length; j++) {
@@ -100,6 +106,7 @@ function loop() {
     }
     for (var i = 0; i < bodies.length; i++) {
         bodies[i].update(0.1);
+        traces.push(bodies[i].pos.copy());
     }
     requestAnimationFrame(loop);
 }
