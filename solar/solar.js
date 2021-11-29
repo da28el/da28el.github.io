@@ -58,6 +58,11 @@ var body = /** @class */ (function () {
         this.vel.add(vec2.scale(this.force, dt));
         this.pos.add(vec2.scale(this.vel, dt / this.mass));
         this.force.set(0, 0);
+        if (this.trace.length > traceCount) {
+            var overflow = this.trace.length - traceCount;
+            this.trace.splice(0, Math.round(dt * overflow));
+            this.traceT.splice(0, Math.round(dt * overflow));
+        }
     };
     body.prototype.draw1 = function () {
         ctx1.beginPath();
@@ -68,7 +73,7 @@ var body = /** @class */ (function () {
     body.prototype.draw2 = function () {
         ctx2.beginPath();
         ctx2.fillStyle = this.color;
-        ctx2.arc(this.pos.x + xoffset2, yoffset2, this.mass, 0, 2 * Math.PI);
+        ctx2.arc(this.pos.x + xoffset2, yoffset2, this.mass * (1 + this.pos.y / width2), 0, 2 * Math.PI);
         ctx2.fill();
     };
     body.prototype.drawTrace1 = function () {
@@ -85,8 +90,10 @@ var body = /** @class */ (function () {
     };
     return body;
 }());
-// Kraft på b1 från b2
 var G = 1;
+var showTrace = true;
+var traceCount = 8192;
+// Kraft på b1 från b2
 function Fg(b1, b2) {
     var R = vec2.sub(b2.pos, b1.pos);
     var r = R.length();
@@ -129,6 +136,7 @@ function init() {
     bodies.push(asteroid);
     paintBackground();
     paintBodies();
+    updateBodyTable();
 }
 var af = -1;
 function start() {
@@ -140,6 +148,10 @@ function start() {
         loop();
     }
 }
+function pause() {
+    cancelAnimationFrame(af);
+    af = -1;
+}
 function loop() {
     updateBodyTable();
     paintBackground();
@@ -148,12 +160,16 @@ function loop() {
         return 1;
     else
         return -1; return 0; });
-    for (var i = 0; i < bodies.length; i++) {
-        bodies[i].drawTrace1();
+    if (showTrace) {
+        for (var i = 0; i < bodies.length; i++) {
+            bodies[i].drawTrace1();
+        }
     }
     for (var i = 0; i < bodies.length; i++) {
         bodies[i].draw1();
-        sorted[i].drawTrace2();
+        if (showTrace) {
+            sorted[i].drawTrace2();
+        }
         sorted[i].draw2();
         for (var j = 0; j < bodies.length; j++) {
             if (i == j)
@@ -172,9 +188,22 @@ function loop() {
 }
 var G_in = document.getElementById("G_in");
 var G_ut = document.getElementById("G_ut");
+var dt_in = document.getElementById("dt_in");
+var dt_ut = document.getElementById("dt_ut");
+var trace_in = document.getElementById("trace");
+var trace_count_in = document.getElementById("tracecount");
 function updateInput() {
     G = +G_in.value;
     G_ut.innerHTML = "G: " + G;
+    dt = +dt_in.value;
+    dt_ut.innerHTML = "dt: " + dt;
+    if (trace_in.checked) {
+        showTrace = true;
+    }
+    else {
+        showTrace = false;
+    }
+    traceCount = +trace_count_in.value;
 }
 var bodyTable = document.getElementById("bodytable");
 function updateBodyTable() {
@@ -196,5 +225,17 @@ function updateBodyTable() {
         row.appendChild(rowMass);
         bodyTable.appendChild(row);
     }
+}
+function addBody() {
+    alert("Window width: " + width1 + ", Window height: " + height1);
+    var n = prompt("name:");
+    var posx = +prompt("position x:");
+    var posy = +prompt("position y:");
+    var velx = +prompt("velocity x:");
+    var vely = +prompt("velocity y:");
+    var mass = +prompt("mass:");
+    var color = prompt("color [hex]:");
+    var b = new body(n, new vec2(posx, posy), new vec2(velx, vely), mass, color);
+    bodies.push(b);
 }
 init();
