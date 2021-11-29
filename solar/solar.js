@@ -5,6 +5,7 @@ var vec2 = /** @class */ (function () {
         if (y === void 0) { y = 0; }
         this.copy = function () { return new vec2(_this.x, _this.y); };
         this.str = function () { return "(" + _this.x + "," + _this.y + ")"; };
+        this.strRound = function () { return "(" + Math.round(_this.x) + "," + Math.round(_this.y) + ")"; };
         this.x = x;
         this.y = y;
     }
@@ -43,9 +44,10 @@ var vec2 = /** @class */ (function () {
     return vec2;
 }());
 var body = /** @class */ (function () {
-    function body(p, v, m, c) {
+    function body(n, p, v, m, c) {
         this.trace = [];
         this.traceT = [];
+        this.name = n;
         this.pos = p;
         this.vel = v;
         this.force = new vec2();
@@ -57,20 +59,26 @@ var body = /** @class */ (function () {
         this.pos.add(vec2.scale(this.vel, dt / this.mass));
         this.force.set(0, 0);
     };
-    body.prototype.draw = function () {
+    body.prototype.draw1 = function () {
         ctx1.beginPath();
         ctx1.fillStyle = this.color;
         ctx1.arc(this.pos.x + xoffset1, this.pos.y + yoffset1, this.mass, 0, 2 * Math.PI);
         ctx1.fill();
+    };
+    body.prototype.draw2 = function () {
         ctx2.beginPath();
         ctx2.fillStyle = this.color;
         ctx2.arc(this.pos.x + xoffset2, yoffset2, this.mass, 0, 2 * Math.PI);
         ctx2.fill();
     };
-    body.prototype.drawTrace = function () {
+    body.prototype.drawTrace1 = function () {
         for (var i = 0; i < this.trace.length; i++) {
             ctx1.fillStyle = '#ffffff';
             ctx1.fillRect(this.trace[i].x + xoffset1, this.trace[i].y + yoffset1, 1, 1);
+        }
+    };
+    body.prototype.drawTrace2 = function () {
+        for (var i = 0; i < this.trace.length; i++) {
             ctx2.fillStyle = '#ffffff';
             ctx2.fillRect(this.trace[i].x + xoffset1, 10 * (time - this.traceT[i]) + yoffset1, 1, 1);
         }
@@ -107,14 +115,15 @@ function paintBackground() {
 }
 function paintBodies() {
     for (var i = 0; i < bodies.length; i++) {
-        bodies[i].draw();
+        bodies[i].draw1();
+        bodies[i].draw2();
     }
 }
 function init() {
     bodies = [];
-    var earth = new body(new vec2(), new vec2(), 100, '#1AA7EC');
-    var moon = new body(new vec2(200, 0), new vec2(0, 200), 20, '#808080');
-    var asteroid = new body(new vec2(240, 0), new vec2(0, 25), 5, '#393939');
+    var earth = new body("Earth", new vec2(), new vec2(), 100, '#1AA7EC');
+    var moon = new body("Moon", new vec2(200, 0), new vec2(0, 200), 20, '#808080');
+    var asteroid = new body("Asteroid", new vec2(240, 0), new vec2(0, 25), 5, '#393939');
     bodies.push(earth);
     bodies.push(moon);
     bodies.push(asteroid);
@@ -132,6 +141,7 @@ function start() {
     }
 }
 function loop() {
+    updateBodyTable();
     paintBackground();
     var sorted = bodies.slice();
     sorted.sort(function (n1, n2) { if (n1.pos.y > n2.pos.y)
@@ -139,8 +149,12 @@ function loop() {
     else
         return -1; return 0; });
     for (var i = 0; i < bodies.length; i++) {
-        sorted[i].drawTrace();
-        sorted[i].draw();
+        bodies[i].drawTrace1();
+    }
+    for (var i = 0; i < bodies.length; i++) {
+        bodies[i].draw1();
+        sorted[i].drawTrace2();
+        sorted[i].draw2();
         for (var j = 0; j < bodies.length; j++) {
             if (i == j)
                 break;
@@ -162,5 +176,25 @@ function updateInput() {
     G = +G_in.value;
     G_ut.innerHTML = "G: " + G;
 }
+var bodyTable = document.getElementById("bodytable");
+function updateBodyTable() {
+    while (bodyTable.firstChild)
+        bodyTable.removeChild(bodyTable.firstChild);
+    for (var i = 0; i < bodies.length; i++) {
+        var row = document.createElement("tr");
+        var rowName = document.createElement("td");
+        rowName.innerHTML = bodies[i].name;
+        var rowPos = document.createElement("td");
+        rowPos.innerHTML = bodies[i].pos.strRound();
+        var rowVel = document.createElement("td");
+        rowVel.innerHTML = bodies[i].vel.strRound();
+        var rowMass = document.createElement("td");
+        rowMass.innerHTML = bodies[i].mass.toString();
+        row.appendChild(rowName);
+        row.appendChild(rowPos);
+        row.appendChild(rowVel);
+        row.appendChild(rowMass);
+        bodyTable.appendChild(row);
+    }
+}
 init();
-loop();
