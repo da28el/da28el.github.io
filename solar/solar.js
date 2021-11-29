@@ -44,6 +44,8 @@ var vec2 = /** @class */ (function () {
 }());
 var body = /** @class */ (function () {
     function body(p, v, m, c) {
+        this.trace = [];
+        this.traceT = [];
         this.pos = p;
         this.vel = v;
         this.force = new vec2();
@@ -64,6 +66,14 @@ var body = /** @class */ (function () {
         ctx2.fillStyle = this.color;
         ctx2.arc(this.pos.x + xoffset2, yoffset2, this.mass, 0, 2 * Math.PI);
         ctx2.fill();
+    };
+    body.prototype.drawTrace = function () {
+        for (var i = 0; i < this.trace.length; i++) {
+            ctx1.fillStyle = '#ffffff';
+            ctx1.fillRect(this.trace[i].x + xoffset1, this.trace[i].y + yoffset1, 1, 1);
+            ctx2.fillStyle = '#ffffff';
+            ctx2.fillRect(this.trace[i].x + xoffset1, 10 * (time - this.traceT[i]) + yoffset1, 1, 1);
+        }
     };
     return body;
 }());
@@ -89,8 +99,6 @@ var yoffset2 = height2 / 2;
 var dt = 0.1;
 var time = 0.0;
 var bodies = [];
-var traces = [];
-var traceT = [];
 function paintBackground() {
     ctx1.fillStyle = "#000000";
     ctx1.fillRect(0, 0, width1, height1);
@@ -104,8 +112,6 @@ function paintBodies() {
 }
 function init() {
     bodies = [];
-    traces = [];
-    traceT = [];
     var earth = new body(new vec2(), new vec2(), 100, '#1AA7EC');
     var moon = new body(new vec2(200, 0), new vec2(0, 200), 20, '#808080');
     var asteroid = new body(new vec2(240, 0), new vec2(0, 25), 5, '#393939');
@@ -132,13 +138,8 @@ function loop() {
         return 1;
     else
         return -1; return 0; });
-    for (var i = 0; i < traces.length; i++) {
-        ctx1.fillStyle = '#ffffff';
-        ctx1.fillRect(traces[i].x + xoffset1, traces[i].y + yoffset1, 1, 1);
-        ctx2.fillStyle = '#ffffff';
-        ctx2.fillRect(traces[i].x + xoffset1, 10 * (time - traceT[i]) + yoffset1, 1, 1);
-    }
     for (var i = 0; i < bodies.length; i++) {
+        sorted[i].drawTrace();
         sorted[i].draw();
         for (var j = 0; j < bodies.length; j++) {
             if (i == j)
@@ -149,8 +150,8 @@ function loop() {
     }
     for (var i = 0; i < bodies.length; i++) {
         bodies[i].update(dt);
-        traces.push(bodies[i].pos.copy());
-        traceT.push(time);
+        bodies[i].trace.push(bodies[i].pos.copy());
+        bodies[i].traceT.push(time);
     }
     af = requestAnimationFrame(loop);
     time += dt;
@@ -162,3 +163,4 @@ function updateInput() {
     G_ut.innerHTML = "G: " + G;
 }
 init();
+loop();
