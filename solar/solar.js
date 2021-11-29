@@ -56,47 +56,90 @@ var body = /** @class */ (function () {
         this.force.set(0, 0);
     };
     body.prototype.draw = function () {
-        ctx.beginPath();
-        ctx.fillStyle = this.color;
-        ctx.arc(this.pos.x + xoffset, this.pos.y + yoffset, this.mass, 0, 2 * Math.PI);
-        ctx.fill();
+        ctx1.beginPath();
+        ctx1.fillStyle = this.color;
+        ctx1.arc(this.pos.x + xoffset1, this.pos.y + yoffset1, this.mass, 0, 2 * Math.PI);
+        ctx1.fill();
+        ctx2.beginPath();
+        ctx2.fillStyle = this.color;
+        ctx2.arc(this.pos.x + xoffset2, yoffset2, this.mass, 0, 2 * Math.PI);
+        ctx2.fill();
     };
     return body;
 }());
 // Kraft på b1 från b2
+var G = 1;
 function Fg(b1, b2) {
-    var R = vec2.sub(b1.pos, b2.pos);
+    var R = vec2.sub(b2.pos, b1.pos);
     var r = R.length();
-    var G = -1;
     return R.scale(G * b1.mass * b2.mass / (r * r));
 }
-var canvas = document.querySelector("canvas");
-var ctx = canvas.getContext("2d");
-var width = canvas.width; // = window.innerWidth;
-var height = canvas.height; // = window.innerHeight;
-var xoffset = width / 2;
-var yoffset = height / 2;
+var canvas1 = document.getElementById("left");
+var ctx1 = canvas1.getContext("2d");
+var canvas2 = document.getElementById("right");
+var ctx2 = canvas2.getContext("2d");
+var width1 = canvas1.width; // = window.innerWidth;
+var height1 = canvas1.height; // = window.innerHeight;
+var width2 = canvas2.width; // = window.innerWidth;
+var height2 = canvas2.height; // = window.innerHeight;
+var xoffset1 = width1 / 2;
+var yoffset1 = height1 / 2;
+var xoffset2 = width2 / 2;
+var yoffset2 = height2 / 2;
+var dt = 0.1;
+var time = 0.0;
 var bodies = [];
-var earth = new body(new vec2(), new vec2(), 100, '#1AA7EC');
-var moon = new body(new vec2(200, 0), new vec2(0, 200), 20, '#808080');
-var asteroid = new body(new vec2(245, 0), new vec2(0, 25), 5, '#808080');
-bodies.push(earth);
-bodies.push(moon);
-bodies.push(asteroid);
 var traces = [];
-function paint() {
-    ctx.lineWidth = 1;
-    ctx.fillStyle = "#000000";
-    ctx.fillRect(0, 0, width, height);
+var traceT = [];
+function paintBackground() {
+    ctx1.fillStyle = "#000000";
+    ctx1.fillRect(0, 0, width1, height1);
+    ctx2.fillStyle = "#000000";
+    ctx2.fillRect(0, 0, width1, height1);
 }
-function loop() {
-    paint();
-    for (var i = 0; i < traces.length; i++) {
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(traces[i].x + xoffset, traces[i].y + yoffset, 1, 1);
-    }
+function paintBodies() {
     for (var i = 0; i < bodies.length; i++) {
         bodies[i].draw();
+    }
+}
+function init() {
+    bodies = [];
+    traces = [];
+    traceT = [];
+    var earth = new body(new vec2(), new vec2(), 100, '#1AA7EC');
+    var moon = new body(new vec2(200, 0), new vec2(0, 200), 20, '#808080');
+    var asteroid = new body(new vec2(240, 0), new vec2(0, 25), 5, '#393939');
+    bodies.push(earth);
+    bodies.push(moon);
+    bodies.push(asteroid);
+    paintBackground();
+    paintBodies();
+}
+var af = -1;
+function start() {
+    if (af == -1)
+        loop();
+    else {
+        cancelAnimationFrame(af);
+        init();
+        loop();
+    }
+}
+function loop() {
+    paintBackground();
+    var sorted = bodies.slice();
+    sorted.sort(function (n1, n2) { if (n1.pos.y > n2.pos.y)
+        return 1;
+    else
+        return -1; return 0; });
+    for (var i = 0; i < traces.length; i++) {
+        ctx1.fillStyle = '#ffffff';
+        ctx1.fillRect(traces[i].x + xoffset1, traces[i].y + yoffset1, 1, 1);
+        ctx2.fillStyle = '#ffffff';
+        ctx2.fillRect(traces[i].x + xoffset1, 10 * (time - traceT[i]) + yoffset1, 1, 1);
+    }
+    for (var i = 0; i < bodies.length; i++) {
+        sorted[i].draw();
         for (var j = 0; j < bodies.length; j++) {
             if (i == j)
                 break;
@@ -105,9 +148,17 @@ function loop() {
         }
     }
     for (var i = 0; i < bodies.length; i++) {
-        bodies[i].update(0.1);
+        bodies[i].update(dt);
         traces.push(bodies[i].pos.copy());
+        traceT.push(time);
     }
-    requestAnimationFrame(loop);
+    af = requestAnimationFrame(loop);
+    time += dt;
 }
-loop();
+var G_in = document.getElementById("G_in");
+var G_ut = document.getElementById("G_ut");
+function updateInput() {
+    G = +G_in.value;
+    G_ut.innerHTML = "G: " + G;
+}
+init();
