@@ -12,6 +12,34 @@
         </a>
     </div>
     <h2>My man's sky</h2>
-    <canvas width="500" height="500" class="img">:(</canvas>
+    <div class="canvas">
+        <canvas width="500" height="500" id="left">:(</canvas>
+        <canvas width="500" height="500" id="right">:(</canvas>
+    </div>
+    <button onclick="start()">Run</button>
+    <!--  
+        <hr>
+    <div class="G">
+        <p id="G_ut">G: 1</p>
+        <input type="range" id="G_in" onchange="updateInput()" min="0.1" max="10" step="0.01" value="1">
+    </div>
+    <div>
+
+    </div>
+    -->
     <script src="solar.js"></script>
+    <style>
+        canvas {
+            border: 2px solid white;
+            width: 25%;
+        }
+        .canvas{
+            display: flex;
+            justify-content: center;
+        }
+        .G {border: 2px solid black;
+            padding: .5em;
+            margin-right: 100em;
+        }
+    </style>
 </body>
