@@ -16,14 +16,32 @@
         <canvas width="500" height="500" id="left">:(</canvas>
         <canvas width="500" height="500" id="right">:(</canvas>
     </div>
-    <div class="start">
+    <div class="controll">
         <button onclick="start()">Run</button>
+        <button onclick="pause()">Pause</button>
+        <button onclick="addBody()">Add body</button>
     </div>
     <hr>
     <div class="input">
         <div class="G">
             <p id="G_ut">G: 1</p>
             <input type="range" id="G_in" onchange="updateInput()" min="0.1" max="2" step="0.01" value="1">
+        </div>
+        <div class="dt">
+            <p id="dt_ut">dt: 0.1</p>
+            <input type="range" id="dt_in" onchange="updateInput()" min="0.01" max="1" step="0.01" value="0.1">
+        </div>
+        <div class="settings">
+            <div class="settings-wrapper">
+                <div class="settings-box">
+                    <p>traces: </p>
+                    <input type="checkbox" id="trace" onclick="updateInput()" checked="true">
+                </div>
+                <div class="settings-input">
+                    <p>trace count: </p>
+                    <input type="number" id="tracecount" onchange="updateInput()" value="8192">
+                </div>
+            </div>
         </div>
         <div class="bodies">
             <table>
@@ -45,7 +63,7 @@
         button{
             font-size: 200%;
         }
-        .start{
+        .controll{
             display: flex;
             justify-content: center;
             align-items: center;
@@ -59,10 +77,51 @@
             display: flex;
             justify-content: center;
         }
-        .G {border: 2px solid black;
-            padding: .5em;
-            margin-right: 100em;
+        .input{
+            display: grid;
+            grid-template-rows: auto auto;
+            grid-template-columns: 20% 20% 20% 20% 20%;
+            grid-gap: 5px 5px;
         }
-
+        .G{
+            grid-row: 1;
+            grid-column-start: 2;
+            grid-column-end: 3;
+            border: 2px solid black;
+            padding: .5em;
+        }
+        .dt{
+            grid-row: 1;
+            grid-column-start: 3;
+            grid-column-end: 4;
+            border: 2px solid black;
+            padding: .5em;
+        }
+        .settings{
+            grid-row: 1;
+            grid-column-start: 4;
+            grid-column-end: 5;
+            border: 2px solid black;
+            padding: .5em;
+        }
+        .settings-wrapper{
+            display: grid;
+            grid-template-rows: auto;
+            grid-template-columns: auto auto;
+            grid-gap: 2px 2px;
+        }
+        .settings-box{
+            grid-column: 1;
+        }
+        .settings-input{
+            grid-column: 2;
+        }
+        .bodies{
+            grid-row: 2;
+            grid-column-start: 2;
+            grid-column-end: 5;
+            border: 2px solid black;
+            padding: .5em;
+        }
     </style>
 </body>
