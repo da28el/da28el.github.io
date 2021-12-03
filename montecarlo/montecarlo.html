@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APPROXIMATION</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <div id="HOME">
+        <a href="../index.html">
+            <img src="https://i.kym-cdn.com/entries/icons/original/000/000/142/feelsgoodman.png" width="40" height="20">
+        </a>
+    </div>
+    <h2>π PIE π</h2>
+    <canvas width="360" height="360" class="img">:(</canvas>
+    <button onclick="addDot(1)" class="img">Add dot</button>
+    <button onclick="addDot(100)" class="img">Add 100 dots</button>
+    <button onclick="addDot(1000)" class="img">Add 1000 dots</button>
+    <h3 id="display">π ≈ 0 <br>
+                     Dots: 0</h3>
+    <h2>Monte carlo simulering:</h2>
+    <h4>π ≈ 4·(punkter innanför cirkeln)÷(antalet punkter)</h4>
+    <p>Låt r vara cirkelns radie. <br>
+        Cirkelns area = r²π <br>
+        Kvadratens area = (2·r)² = 4·r² <br>
+        Punkterna innanför cirkeln kommer approximera dess area. <br>
+        Det totala antalet punkter kommer approximera kvadratens area. <br>
+        (cirkelns area) ÷ (kvadratens area) = r²π ÷ 4·r² = π ÷ 4 <br>
+        4·(punkterna innanför cirkeln) ÷ (antalet punkter) ≈ π <br>
+        Q.E.D.
+    </p>
+
+    <script src="pi.js"></script>
+    <style>
+        h3{
+            font-size: 200%;
+        }
+        h4{
+            text-align: center;
+            font-size: 150%;
+        }
+        p{
+            text-align: center;
+            font-size: 110%;
+            border-style: dashed;
+            margin-left: 30%;
+            margin-right: 30%;
+        }
+
+    </style>
+</body>
