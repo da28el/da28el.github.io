@@ -347,6 +347,7 @@ function input() {
             rowName.innerHTML = containerBoxes[i].getName() + ":";
             var rowValue = document.createElement("input");
             rowValue.type = "number";
+            rowValue.value = "0";
             rowValue.id = containerBoxes[i].getName();
             row.appendChild(rowName);
             row.appendChild(rowValue);
