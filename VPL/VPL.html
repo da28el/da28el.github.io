@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LABview ;)</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <div id="HOME">
+        <a href="../index.html">
+            <img src="https://i.kym-cdn.com/entries/icons/original/000/000/142/feelsgoodman.png" width="40" height="20">
+        </a>
+    </div>
+    <h2>SCRATCHing my eyes out</h2>
+    <canvas width="480" height="360" class="img" onmousedown="mousePressed(event)" onmouseup="mouseReleased()" onmousemove="mouseMoved(event)" onmouseleave="mouseReleased()">:(</canvas>
+    <div class="controlls">
+        <button onclick="run()">Run</button>
+        <button onclick="addBox(1)">Add Numeric Constant</button>
+        <button onclick="addBox(2)">Add Numeric Operator</button>
+        <button onclick="addBox(3)">Add Numeric Display</button>
+        <button onclick="addBox(4)">Add Numeric Input</button>
+        <button onclick="wire()">wire</button>
+        <button onclick="clearOne()">Delete</button>
+        <button onclick="clearAll()">Clear All</button>
+    </div>
+    <div class="inputs">
+        <table id="iTable"></table>
+    </div>
+    <br>
+    <div class="outputs">
+        <table id="oTable"></table>
+    </div>
+    <script src="VPL.js"></script>
+    <p>Mitt bevis på att programmet <strong>LabVIEW</strong> <i>(@chyrren notera versaliseringen)</i> är skit genom att skriva ett eget på ett dygn och under 400 rader kod.</p>
+    <p>Var är min 5a Ping?</p>
+    <p>❤️ Hoppas er dag är lika dålig som min ❤️</p>
+    <p>Korta instruktioner:</p>
+    <ul>
+        <li><b>Run</b> Skriver ut outputs från alla <i>Displays</i>.</li>
+        <li><b>Add Numeric Constant</b> lägger till ett nummer så skriv <b>BARA</b> in nummer.</li>
+        <li><b>Add Numeric Operator</b> lägger till en aritmetisk operator så inputen blir (<i> + - * / </i>) capish?</li>
+        <li><b>Add Numeric Input</b> lägger till ett textfält där <b>nummer</b> kan skrivas in.</li>
+        <li><b>Wire</b> tryck först på <i>source</i> sen <i>sink</i> så borde de funka.</li>
+        <li><b>Delete</b> tryck på en <i>Nod</i> för att ta bort den... simple as that.</li>
+        <li><b>Clear All</b> tar bort <b>ALLT</b> så var inte dum.</li>
+    </ul>
+    <style>
+        .controlls{
+            display: flex;
+            justify-content: center;
+        }
+        .outputs{
+            display: flex;
+            justify-content: center;
+            margin-right: 85%;
+            border: 2px solid rebeccapurple;
+        }
+    </style>
+</body>
