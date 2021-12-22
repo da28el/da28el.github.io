@@ -23,7 +23,7 @@ const db = firebase.database();
 
 document.getElementById("msg-form").addEventListener("submit", sendMessage);
 
-var user_input = prompt("username:");
+let user_input = prompt("username:");
 while(user_input.toLocaleLowerCase() == "admin"){
     alert("Eric försök inte ens");
     user_input = prompt("username:");
@@ -68,7 +68,7 @@ function encrypt(msg, cipher){
 
 function decrypt(msg, cipher){
     if(!msg) msg = "";
-    const m = CryptoJS.AES.decrypt(window.atob(msg), cipher).toString(CryptoJS.enc.Utf8);
-    if(m = "") return "🔒";
+    let m = CryptoJS.AES.decrypt(window.atob(msg), cipher).toString(CryptoJS.enc.Utf8);
+    if(m == "") return "🔒";
     else return m;
 }
