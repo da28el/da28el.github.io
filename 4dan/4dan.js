@@ -63,47 +63,7 @@ function encrypt(msg, cipher){
 }
 
 function decrypt(msg, cipher){
-    if(!msg) return "";
-    return CryptoJS.AES.decrypt(window.atob(msg), cipher).toString(CryptoJS.enc.Utf8);
+    if(!msg) msg = "";
+    const m = CryptoJS.AES.decrypt(window.atob(msg), cipher).toString(CryptoJS.enc.Utf8);
+    if(m = "") return "🔒";
 }
-
-const encryptWithAES = (text) => {
-    const passphrase = "123";
-    return CryptoJS.AES.encrypt(text, passphrase).toString();
-};
-  
-const decryptWithAES = (ciphertext) => {
-    const passphrase = "123";
-    const bytes = CryptoJS.AES.decrypt(ciphertext, passphrase);
-    const originalText = bytes.toString(CryptoJS.enc.Utf8);
-    return originalText;
-};
-
-/*
-function readMessages(){
-    const msg = ref(db, 'messages/');
-    onValue(msg, (snapshot) => {
-        for(let m in snapshot.val()){
-            let n = snapshot.val()[m];
-            console.log("["+n.sender+"]: "+n.data+"\t("+n.timestamp+")");
-        }
-    }); 
-}
-
-function writeMessage(msg, sender){
-    onValue(ref(db, 'messages/'), function(snapshot) {
-        set(ref(db, 'messages/' + snapshot.numChildren), {
-            data: msg,
-            sender: sender,
-            timestamp: Date.now(),
-        });
-    })
-}
-
-readMessages();
-console.log(getMessageId());
-
-writeMessage("Testing", "28", 0);
-readUserData();
-writeMessage("Tested", "28", 1);
-*/
