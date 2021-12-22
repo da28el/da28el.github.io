@@ -24,6 +24,10 @@ const db = firebase.database();
 document.getElementById("msg-form").addEventListener("submit", sendMessage);
 
 let user_input = prompt("username:");
+while(user_input.toLocaleLowerCase() == "admin"){
+    alert("Eric försök inte ens");
+    user_input = prompt("username:");
+}
 const cipher = prompt("key:");
 const user = encrypt(user_input, cipher);
 user_input = "";
