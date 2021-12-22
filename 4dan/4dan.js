@@ -68,7 +68,5 @@ function encrypt(msg, cipher){
 
 function decrypt(msg, cipher){
     if(!msg) msg = "";
-    let m = CryptoJS.AES.decrypt(window.atob(msg), cipher).toString(CryptoJS.enc.Utf8);
-    if(m == "") return "🔒";
-    else return m;
+    return CryptoJS.AES.decrypt(window.atob(msg), cipher).toString(CryptoJS.enc.Utf8);
 }
