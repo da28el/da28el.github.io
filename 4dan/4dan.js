@@ -23,7 +23,7 @@ const db = firebase.database();
 
 document.getElementById("msg-form").addEventListener("submit", sendMessage);
 
-let user_input = prompt("username:");
+var user_input = prompt("username:");
 while(user_input.toLocaleLowerCase() == "admin"){
     alert("Eric försök inte ens");
     user_input = prompt("username:");
@@ -35,6 +35,7 @@ user_input = "";
 function sendMessage(e){
     e.preventDefault();
     const msgInput = document.getElementById("msg-input");
+    if(msgInput.value == "") return;
     const msg = encrypt(msgInput.value, cipher);
     const timestap = Date.now().toString()
 
@@ -54,10 +55,18 @@ const fetchChat = db.ref("messages/");
 
 fetchChat.on("child_added", function(snapshot){
     const msgs = snapshot.val();
-    //if(decrypt(msgs.user,cipher) == "") return;
-    const msg = `<li class=${
-        decrypt(user,cipher) === decrypt(msgs.user,cipher) ? "sent" : "receive"
-      }><span>${decrypt(msgs.user, cipher)}: </span>${decrypt(msgs.msg, cipher)}</li>`;
+    if(decrypt(msgs.user,cipher) == "" && cipher != "0") return;
+    var msg;
+    if(isValidHttpUrl(decrypt(msgs.msg, cipher))){
+        msg = `<li class=${
+            decrypt(user,cipher) === decrypt(msgs.user,cipher) ? "sent" : "receive"
+            }><span>${decrypt(msgs.user, cipher)}: </span><img src="${decrypt(msgs.msg, cipher)}" width=100% height=100%></li>`;
+    } else {
+        msg = `<li class=${
+            decrypt(user,cipher) === decrypt(msgs.user,cipher) ? "sent" : "receive"
+            }><span>${decrypt(msgs.user, cipher)}: </span>${decrypt(msgs.msg, cipher)}</li>`;
+    }
+    
       document.getElementById("msgs").innerHTML += msg;
 })
 
@@ -68,5 +77,20 @@ function encrypt(msg, cipher){
 
 function decrypt(msg, cipher){
     if(!msg) msg = "";
-    return CryptoJS.AES.decrypt(window.atob(msg), cipher).toString(CryptoJS.enc.Utf8);
+    try {
+        return CryptoJS.AES.decrypt(window.atob(msg), cipher).toString(CryptoJS.enc.Utf8);
+    } catch (_) {
+        return "";
+    }
+
+}
+
+function isValidHttpUrl(string) {
+    var url;
+    try {
+      url = new URL(string);
+    } catch (_) {
+      return false;  
+    }
+    return url.protocol === "http:" || url.protocol === "https:";
 }
