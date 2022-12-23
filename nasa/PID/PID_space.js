@@ -219,11 +219,13 @@ let PID_y = {
         let e0 = this.e;
         this.e = y - r;
         this.i += this.e*dt;
-        this.i = Math.max(this.i, 100);
         this.d = (this.e - e0)/dt;
         this.u = this.Kp * this.e
                + this.Ki * this.i
                + this.Kd * this.d;
+        if(Ki == 0) this.i = 0; // prevent integral windup while tuning
+        this.i = Math.min(this.i, 10);
+        this.i = Math.max(this.i, -10);    // prevent integral windup
         return this.u;
     }
 
@@ -241,11 +243,13 @@ let PID_x = {
         let e0 = this.e;
         this.e = r - y;
         this.i += this.e*dt;
-        this.i = Math.max(this.i, 100);
         this.d = (this.e - e0)/dt;
         this.u = this.Kp * this.e
-                + this.Ki * this.i
-                + this.Kd * this.d;
+               + this.Ki * this.i
+               + this.Kd * this.d;
+        if(Ki == 0) this.i = 0; // prevent integral windup while tuning
+        this.i = Math.min(this.i, 10);
+        this.i = Math.max(this.i, -10);    // prevent integral windup
         return this.u;
     }
 }
