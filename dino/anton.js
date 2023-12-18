@@ -29,6 +29,9 @@ const height = canvas.height;
 window.addEventListener('keyup', function(event) { Key.onKeyup(event); }, false);
 window.addEventListener('keydown', function(event) { Key.onKeydown(event); }, false);
 
+canvas.addEventListener('touchstart', function(event) { Key.onKeydown({keyCode: Key.SPACE}); }, false);
+canvas.addEventListener('touchend', function(event) { Key.onKeyup({keyCode: Key.SPACE}); }, false);
+
 /*************/
 /* variables */
 /*************/
@@ -265,10 +268,13 @@ async function start()
             if(Key.isDown(Key.SPACE))
                 resolve();
         }, false);
+        canvas.addEventListener('touchstart', function(event) {
+            resolve();
+        }, false);
     });
 
     await promise;
-    running = true;
+    running = true;    
     loop();
 }
 
