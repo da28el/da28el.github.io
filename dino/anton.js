@@ -110,7 +110,7 @@ function draw_dino()
     else
     {
         dino_anim = 0;
-        draw_dino();
+        ctx.drawImage(dino_run2, dino_x, dino_y, dino_w, dino_h);
     }
     ctx.resetTransform();
     dino_anim++;
