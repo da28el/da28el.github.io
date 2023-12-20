@@ -51,6 +51,7 @@ dino_run1.src = "anton.png";//"plant1.png";
 const dino_run2 = new Image(31, 49)//new Image(16, 32)
 dino_run2.src = "anton2.png";//"plant2.png";
 let dino_anim = 0;
+let dino_theta = 0;
 // physics
 const dino_ax = 1e-3;               // acceleration
 const dino_ay = 0.6;
@@ -99,6 +100,9 @@ function draw_background()
 /* dino */
 function draw_dino()
 {
+    ctx.translate(dino_x+dino_w/2, dino_y+dino_h/2);
+    ctx.rotate(dino_theta);
+    ctx.translate(-dino_x-dino_w/2, -dino_y-dino_h/2);
     if(dino_anim < 10)
         ctx.drawImage(dino_run1, dino_x, dino_y, dino_w, dino_h);
     else if(dino_anim < 20)
@@ -108,7 +112,9 @@ function draw_dino()
         dino_anim = 0;
         draw_dino();
     }
+    ctx.resetTransform();
     dino_anim++;
+    dino_theta += 0.1;
 }
 
 function update_dino(dt)
@@ -250,6 +256,7 @@ async function start()
     dino_vx = 4;
     dino_vy = 0;
     dino_y = ground_y - dino_h;
+    dino_theta = 0;
     obstacles_x = [];
     obstacles_y = [];
     obstacle_cooldown = 0;
