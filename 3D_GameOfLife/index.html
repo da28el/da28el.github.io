@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>3D game of life</title>
+        <style>
+            /* body {background-color: powderblue;}
+            .center {margin: auto; width: 50%; border: 3px solid green; padding: 10px;}
+            .img {display: block; margin-left: auto; margin-right: auto;} */
+            body {
+                background-color: powderblue;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin-top: -100px;
+                margin-bottom: 0px;
+            }
+            .centered-div {
+                position: absolute;
+                margin-top: 855px;
+                text-align: left; /* Optional: Align text inside the div to center */
+                padding: 20px;
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                background-color: #f4f4f4;
+            }
+        </style>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"
+            integrity="sha512-zhHQR0/H5SEBL3Wn6yYSaTTZej12z0hVZKOv3TwCUXT1z5qeqGcXJLLrbERYRScEDDpYIJhPC1fk31gqR783iQ=="
+            crossorigin="anonymous"
+            defer
+        ></script>
+        <script src="webgl-gameoflife.js" type="module"></script>
+    </head>
+
+    <body>
+        <div style="position: relative;">
+            <canvas id="glcanvas" width="900" height="600"></canvas>
+            <div id="crosshair" style="position: absolute; left: 450px; top: 300px; width: 4px; height: 4px; background: white;"></div>
+            <div id="overlay" style="position: absolute; left: 10px; top: 10px; padding: 5px; background: rgba(0,0,0,0.5);">
+                <div style="color: white;">FPS: <span id="framerate"></span></div>
+                <div style="color: white;">Camera: <span id="camera"></span></div>
+                <div style="color: white;">Timestep: <span id="timestep"></span></div>
+            </div>
+        </div>
+        <div id="controls" class="centered-div">
+            <div style="display: inline-block;">
+                <p style="display: inline-block; margin-top: -10px;">Speed:</p>
+                <input id="speed_rule" type="range" min="1" max="10" value="4" step="1" style="display: inline-block;"></slider>
+            </div>
+            <br>
+            <div id="ruleset" style="display: inline-block; margin-top: -30px; margin-bottom: 5px;">
+                <p style="display: inline-block; margin-bottom: 5px;">Rules (underpopulation, overpopulation, reproduction):</p>
+                <br>
+                <input id="u_rule" type="number" min="0" max="26" value="2" step="1" style="display: inline-block;">
+                <input id="o_rule" type="number" min="0" max="26" value="3" step="1" style="display: inline-block;">
+                <input id="r_rule" type="number" min="0" max="26" value="3" step="1" style="display: inline-block;">
+            </div>
+            <br>
+            <button id="play_button">Play</button>
+            <button id="pause_button">Pause</button>
+            <button id="reset_button">Reset</button>
+            <button id="step_button">Step</button>
+            <button id="soup_button">Soup</button>
+            <button id="save_button">Save</button>
+            <button id="load_button">Load</button>
+            <p style="margin-top: 0px; margin-bottom: -5px;">2D Moore neighborhood instead of 3D (= ignore Z-axis)<input id="moore2D_rule" type="checkbox" checked="true"></p>
+            <h4 style="margin-top: 5px; margin-bottom: 0px">Controls:</h4>
+            <h4 style="margin-top: 0px; margin-bottom: 0px">Click canvas: lock mouse, ESC: unlock mouse</h4>
+            <h4 style="margin-top: 0px; margin-bottom: 0px">Camera movement - WASD: default, Q: down, E: up</h4>
+            <h4 style="margin-top: 0px; margin-bottom: 0px;">Mouse - left-click: place, right-click: remove</h4>
+            <h4 style="margin-top: 0px; margin-bottom: -10px;">Step simulation: R, Play/Pause: T, Reset: Y</h4>
+        </div>
+    </body>
+</html>
