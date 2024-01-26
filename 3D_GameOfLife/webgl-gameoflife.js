@@ -89,7 +89,7 @@ function main() {
         world.reset();
     });
     step_control.addEventListener("click", () => {
-        world.update(underpopulation, overpopulation, reproduction, moore2D);
+        world.update(underpopulation, overpopulation, reproduction, !moore2D);
     });
     soup_control.addEventListener("click", () => {
         world.soup();
