@@ -249,7 +249,7 @@ async function mouseUp(event) {
             box.card = SET_VISIBLE(box.card, 1);
         }
     }
-    if (allVisible || autowin) {
+    if (allVisible && autowin) {
         boxes.sort((a, b) => a.card - b.card);
         //for (let i = 0; i < boxes.length; i++) {
         //    boxes[i].z = z++;
