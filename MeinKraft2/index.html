@@ -1,18 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>WebGL Demo</title>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"
-      integrity="sha512-zhHQR0/H5SEBL3Wn6yYSaTTZej12z0hVZKOv3TwCUXT1z5qeqGcXJLLrbERYRScEDDpYIJhPC1fk31gqR783iQ=="
-      crossorigin="anonymous"
-      defer
-    ></script>
-    <script src="webgl-demo.js" type="module"></script>
-  </head>
+    <head>
+        <meta charset="utf-8" />
+        <title>WebGL Demo</title>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"
+            integrity="sha512-zhHQR0/H5SEBL3Wn6yYSaTTZej12z0hVZKOv3TwCUXT1z5qeqGcXJLLrbERYRScEDDpYIJhPC1fk31gqR783iQ=="
+            crossorigin="anonymous"
+            defer
+        ></script>
+        <script src="webgl-demo.js" type="module"></script>
+    </head>
 
-  <body>
-    <canvas id="glcanvas" width="1080" height="720"></canvas>
-  </body>
+    <body>
+        <div class="container" style="position: relative;">
+            <canvas id="glcanvas" width="1080" height="720"></canvas>
+            <div id="crosshair" style="position: absolute; left: 540px; top: 360px; width: 4px; height: 4px; background: white;"></div>
+            <div id="overlay" style="position: absolute; left: 10px; top: 10px; padding: 5px; background: rgba(0,0,0,0.5);">
+                <div style="color: white;">FPS: <span id="framerate"></span></div>
+                <div style="color: white;">Camera: <span id="camera"></span></div>
+                <div style="color: white;">Chunk: <span id="chunk"></span></div>
+            </div>
+        </div>
+    </body>
 </html>

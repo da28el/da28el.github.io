@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nasa</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        canvas {
+            background: #fff; 
+            border: 1px solid #aaa; 
+            border-radius: 15px; 
+            overflow: hidden;
+        }
+        .run {
+            background: #4CAF50;
+            color: white;
+            width: 15%;
+        }
+        .stop {
+            background: #f44336;
+            color: white;
+            width: 15%;
+        }
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        input[type='number']{
+            width: 60px;
+        } 
+    </style>
+</head>
+<body>
+    <div id="HOME">
+        <a href="../index.html">
+            <img src="https://i.kym-cdn.com/entries/icons/original/000/000/142/feelsgoodman.png" width="40" height="20">
+        </a>
+    </div>
+    <!--  onmousedown="mouseDown(event)", onmousemove="mouseMove(event)" onmouseup="mouseUp(event)"  -->
+    <h2>🚀</h2>
+    <h2>kolla jag har gjort en drone</h2>
+    <canvas width="1080" height="720" id="canvas_manual" class="img" oncontextmenu="event.preventDefault();">:(</canvas>
+    <div class="center" style="margin-top: 5px;">
+        <button onclick="button(0)" class="run">Kör</button>
+        <button onclick="button(1)" class="stop">Stopp</button>
+        <input type="range" id="input_dt" min="15" max="100" value="50" oninput="slider(this.value)">
+    </div>
+    <h3 class="center">tryck ☝️ så får du se den, men rör inte min slider</h3>
+    <h3 class="center">inte så lätt va? dra ner slidern lite så kanske din såsiga hjärna kan hänga med</h3>
+    <h2>🤖</h2>
+    <h2>dags att PIDa</h2>
+    <div class="center">
+        <canvas width="540" height="720" id="canvas_pid1" oncontextmenu="event.preventDefault();"
+            style="background: #fff; border: 1px solid #aaa; border-radius: 15px; overflow: hidden;">:(</canvas>
+        <canvas width="540" height="720" id="canvas_pid2" oncontextmenu="event.preventDefault();"
+            style="background: #fff; border: 1px solid #aaa; border-radius: 15px; overflow: hidden;">:(</canvas>
+    </div>
+    <div class="center">
+        <button onclick="button(2)" class="run">Kör</button>
+        <button onclick="button(3)" class="stop">Stopp</button>
+        <p>|Kp:</p>
+        <input type="number" id="input_kp" value="1.2" step="0.1" onchange="number_input(0, this.value)" style="width: 7%;">
+        <p>|Ki:</p>
+        <input type="number" id="input_ki" value="0.001" step="0.01" onchange="number_input(1, this.value)" style="width: 7%;">
+        <p>|Kd:</p>
+        <input type="number" id="input_kd" value="1.05" step="0.05" onchange="number_input(2, this.value)" style="width: 7%;">
+    </div>
+    <h3 class="center">Här är några olika PIDs med olika parametrar, kan väl vara kul att se... den högra kan man ställa in själv</h3>
+    <h3 class="center">Testa och se om du kan hitta bättre PID-värden än jag och maila dom till mig på: <a href="https://i.gifer.com/13Qe.gif">hatiwiy466@temp-mail.org</a></h3>
+    <h3 class="center">PIDsen presterar bara bra för att dom inte behöver bry sig om balans, den gasar alltid symetriskt så rotationen alltid är 0 (testa "G" i 1)</h3>
+    <h3 class="center">För få mer kontroll måste man använda mer avancerad reglerteknik...😴 eller? 😲</h3>
+    <h2>🧠</h2>
+    <h2>Artificiella neuroner</h2>
+    <h3 class="center">Artificiella neurala nätverk är universella funktionsapproximatorer, så med tillräckligt många lager borde det gå att flyga min drone</h3>
+    <h3 class="center">Minns du hur NN fungerar? inte...? Här är en recap:</h3>
+    <h3 class="center">Vi tar ett neuron med 2 inputs och 1 output, neuronen har 2 vikter (W) och en bias (B)</h3>
+    <img class="img" width="1080" height="640" src="neuron.png" width="300" height="200" class="center">
+    <h3 class="center">Vår output y = ReLU(W∙X+B)</h3>
+    <h3 class="center">ReLU är vår aktiveringsfunktion som ger nätverk möjligheten att approximera olinjäritet [ReLU(x) = max(0, x)]</h3>
+    <h3 class="center">Leaky ReLU är ett alternativ till den vanliga som gör att aktiveringsfunktionen får nollskild derivata för inputs mindre än 0 (vilket inte kommer spela roll här)</h3>
+    <img class="img" width="1440" height="720" src="leaky_relu.png" width="300" height="200" class="center">
+    <h3 class="center">Vi har 2 numeriska värden in, 1 numeriskt värde ut i vår neuron: y = f(x1, x2)</h3>
+    <h3 class="center">Nu kan vi se vad en ensam neuron kan lära sig, addition?</h3>
+    <div class="center">
+        <table style="border: 0px solid black;">
+            <tr>
+                <th>x1</th>
+                <th>x2</th>
+                <th>y</th>
+            </tr>
+            <tr>
+                <td>0</td>
+                <td>0</td>
+                <td><input type="number" value="0" onchange="number_input(3, this.value)"></td>
+            </tr>
+            <tr>
+                <td>0</td>
+                <td>1</td>
+                <td><input type="number" value="1" onchange="number_input(4, this.value)"></td>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>0</td>
+                <td><input type="number" value="1" onchange="number_input(5, this.value)"></td>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>1</td>
+                <td><input type="number" value="2" onchange="number_input(6, this.value)"></td>
+            </tr>
+        </table>
+        <h3 style="margin: 5px; margin-bottom: 40px;">=></h3>
+        <div>
+            <table>
+                <tr>
+                    <th>W1</th>
+                    <th>W2</th>
+                    <th>B</th>
+                </tr>
+                <tr>
+                    <td><input id="output_W1" type="number" value="0" readonly="true"></td>
+                    <td><input id="output_W2" type="number" value="0" readonly="true"></td>
+                    <td><input id="output_B" type="number" value="0" readonly="true"></td>
+                </tr>
+            </table>
+            <table style="margin-top: 5px;">
+                <tr>
+                    <th>X1</th>
+                    <th>X2</th>
+                    <th>Y</th>
+                </tr>
+                <tr>
+                    <td><input id="input_X1" type="number" value="0" onchange="number_input(7, this.value)"></td>
+                    <td><input id="input_X2" type="number" value="0" onchange="number_input(8, this.value)"></td>
+                    <td><input id="output_Y" type="number" value="0" readonly="true"></td>
+                </tr>
+            </table>
+        </div>
+        <h3 style="margin: 5px; margin-bottom: 40px;">=></h3>
+        <table style="margin-bottom: 51.5px;">
+            <tr>
+                <th>Loss</th>
+            </tr>
+            <tr>
+                <td><input id="output_LOSS" type="number" value="0" readonly="true"></td>
+            </tr>
+        </table>
+    </div>
+    <div class="center">
+        <button onclick="button(6)" class="run">Kör</button>
+    </div>
+    <h3 class="center">Ställ in träningsvärdena till vänster och tryck "kör"</h3>
+    <h3 class="center">Kolla outputen Y från den tränade neuronen genom X1, X2</h3>
+    <h3 class="center">
+        Testa att träna in en OR-gate, AND-gate och XOR-gate. 
+        <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="center">Fuzzy Logic</a>
+    </h3>
+    <h3 class="center">Den lär sig genom att minimera en kostnadsfunktion Cost(r, y) = 1/2 * (r - y)^2</h3>
+    <h3 class="center">Men hur?</h3>
+    <h2>🧬</h2>
+    <img class="img" width="1080" height="720" src="evolution.png" width="1500" height="1011" class="center">
+    <img class="img" width="720" height="1920" src="Parning.png" class="center">
+    <h2>hänger du me?</h2>
+    <img class="img" src="shabooya.gif">
+    <h2>🧫</h2>
+    <h2>Lager av neuroner</h2>
+    <h3 class="center">Vi seriekopplar flera neuroner för att approximera mer komplexa funktioner</h3>
+    <img class="img" src="network.png" width="100%" class="center">
+    <h3 class="center">
+        X1' = ReLU(w11∙x1 + w12∙x2 + b1) <br>
+        X2' = ReLU(w21∙x1 + w22∙x2 + b2) <br>
+        y = ReLU(w1∙x1' + w2∙x2' + b) = ReLU(w1∙ReLU(w11∙x1 + w12∙x2 + b1) + w2∙ReLU(w21∙x1 + w22∙x2 + b2) + b)
+    </h3>
+    <h3 class="center">same same but different</h3>
+    <div class="center">
+        <table style="border: 0px solid black;">
+            <tr>
+                <th>x1</th>
+                <th>x2</th>
+                <th>y</th>
+            </tr>
+            <tr>
+                <td><input type="number" value="0" onchange="number_input(9, this.value)"></td>
+                <td><input type="number" value="0" onchange="number_input(10, this.value)"></td>
+                <td><input type="number" value="0" onchange="number_input(11, this.value)"></td>
+            </tr>
+            <tr>
+                <td><input type="number" value="0" onchange="number_input(12, this.value)"></td>
+                <td><input type="number" value="1" onchange="number_input(13, this.value)"></td>
+                <td><input type="number" value="1" onchange="number_input(14, this.value)"></td>
+            </tr>
+            <tr>
+                <td><input type="number" value="1" onchange="number_input(15, this.value)"></td>
+                <td><input type="number" value="0" onchange="number_input(16, this.value)"></td>
+                <td><input type="number" value="1" onchange="number_input(17, this.value)"></td>
+            </tr>
+            <tr>
+                <td><input type="number" value="1" onchange="number_input(18, this.value)"></td>
+                <td><input type="number" value="1" onchange="number_input(19, this.value)"></td>
+                <td><input type="number" value="0" onchange="number_input(20, this.value)"></td>
+            </tr>
+        </table>
+        <h3 style="margin: 5px;">=></h3>
+        <div>
+            <table style="border: 0px solid black;">
+                <tr>
+                    <th>Layer1</th>
+                </tr>
+                <tr>
+                    <th>W</th>
+                    <th></th>
+                    <th>B</th>
+                </tr>
+                <tr>
+                    <td><input id="output_1W11" type="number" value="0" readonly="true"></td>
+                    <td><input id="output_1W12" type="number" value="0" readonly="true"></td>
+                    <td><input id="output_1B1" type="number" value="0" readonly="true"></td>
+                </tr>
+                <tr>
+                    <td><input id="output_1W21" type="number" value="0" readonly="true"></td>
+                    <td><input id="output_1W22" type="number" value="0" readonly="true"></td>
+                    <td><input id="output_1B2" type="number" value="0" readonly="true"></td>
+                </tr>
+            </table>
+        </div>
+        <h3 style="margin: 5px;">=></h3>
+        <div>
+            <table style="border: 0px solid black;">
+                <tr>
+                    <th>Layer2</th>
+                </tr>
+                <tr>
+                    <th>W</th>
+                    <th>B</th>
+                    <th>Loss</th>
+                </tr>
+                <tr>
+                    <td><input id="output_2W1" type="number" value="0" readonly="true"></td>
+                    <td><input id="output_2B" type="number" value="0" readonly="true"></td>
+                    <td><input id="output_2LOSS" type="number" value="0" readonly="true"></td>
+                </tr>
+                <tr>
+                    <td><input id="output_2W2" type="number" value="0" readonly="true"></td>
+                </tr>
+            </table>
+        </div>
+        <h3 style="margin: 5px;">=></h3>
+
+        <table style="border: 0px solid black;">
+            <tr>
+                <th>X1</th>
+                <th>X2</th>
+                <td></td>
+                <th>Y</th>
+            </tr>
+            <tr>
+                <td><input type="number" value="0" onchange="number_input(21, this.value)"></td>
+                <td><input type="number" value="0" onchange="number_input(22, this.value)"></td>
+                <td></td>
+                <td><input id="output_forward_Y" type="number" value="0" readonly="true"></td>
+            </tr>
+        </table>
+    </div>
+    <div class="center">
+        <button onclick="button(7)" class="run">Kör</button>
+    </div>
+    <h3 class="center">testa att träna in lite olinjära funktioner som OR, AND, XOR osv.</h3>
+    <h2>🧑‍✈️🧠</h2>
+    <h2>Pilotnerver</h2>
+    <canvas width="1080" height="720"  id="canvas_nn" class="img" oncontextmenu="event.preventDefault();"
+        style="background: #fff; border: 1px solid #aaa; border-radius: 15px; overflow: hidden;">:(</canvas>    
+    <div class="center" style="margin-top: 5px;">
+        <button onclick="button(4)"class="run">Kör</button>
+        <button onclick="button(5)"class="stop">Stopp</button>
+        <p>|n_drones:</p>
+        <input type="number" id="input_n_drones" value="500" step="50" onchange="number_input(23, this.value)" style="width: 7%;">
+        <p>|t_generation:</p>
+        <input type="number" id="input_generation_length" value="800" step="50" onchange="number_input(24, this.value)" style="width: 7%;">
+        <p>|dt scale:</p>
+        <input type="number" id="input_nn_dt" value="50" step="1" onchange="number_input(25, this.value)" style="width: 7%;">
+        <p>|pwo:</p>
+        <input type="checkbox" id="input_nn_pretrain" value="false" onchange="number_input(26, this.checked)">
+    </div>
+    <h3 class="center">Tryck "KÖR" för att se om skiten ens fungerar eller om jag bara har slösat tid här</h3>
+    <h3 class="center">När du har tröttnat på att se misslyckande kan du kryssa i pwo och starta om för att börja med ett färdigare nätverk</h3>
+    <h3 class="center">Det färdigtränade nätverket verkar vara lite blygt och presterar oftast inte första generationen, ge den lite tid eller testa att starta om</h3>
+    <hr>
+    <h3 class="center">Idén med AI och neurala nätverk är att utifrån input och output hitta en funktion som beskriver sambandet</h3>
+    <h3 class="center">Det låter som en perfekt lösning för differentialekvationer, som en blackbox som kan användas överallt</h3>
+    <h3 class="center">Men att träna ett nätverk och hitta rätt design och parametrar är som att träna en dvärghamster att göra backflips</h3>
+    <h2>Här är mina tips:</h2>
+    <h3 class="center">1.</h3>
+    <h3 class="center">Aktiveringsfunktionen spelar roll för träningen bäst att testa några olika och se</h3>
+    <h3 class="center">2.</h3>
+    <h3 class="center">Trots att NN kan lära sig avancerade mönster är det bra att dumma ner allt så långt det går</h3>
+    <h3 class="center">För en människa är det uppenbart att rotationen sparad som vinkel i radianer representerar en vektor i planet</h3>
+    <h3 class="center">Men för slumpen att komma fram till eulers formel på kort tid och med få parametrar är önsketänk</h3>
+    <h3 class="center">Först försökte jag ge positionen av dronen och låta nätverket genom kostnadsfunktionen lista ut vart den skull hålla sig</h3>
+    <h3 class="center">men det fungerade bättre att dumma ner (behandla) informationen genom att ge riktningen till målet istället</h3>
+    <h3 class="center">3.</h3>
+    <h3 class="center">Det finns lokala minimums så det räcker och blir över, bäst att starta om när den inte vill lära sig</h3>
+    <h2>Hoppas du lärde dig något, jag gjorde inte det.</h2>
+    <script src="darwin.js"></script>
+</body>

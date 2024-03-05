@@ -169,6 +169,38 @@ class Model {
         return new Model(vertices, indices, normals, textureCoordinates, position, rotation, scale);
     }
 
+    static Quad(position = [0, 0, 0], rotation = [0, 0, 0], scale = [1, 1, 0]) {
+        let vertexPositions = [
+             1.0, -1.0, 0.0,
+            -1.0, -1.0, 0.0,
+            -1.0,  1.0, 0.0,
+             1.0,  1.0, 0.0,
+        ];
+
+        let vertices = [];
+        for (let i = 0; i < vertexPositions.length; i+=3) {
+            vertices.push(vertexPositions[i]*scale[0]);
+            vertices.push(vertexPositions[i+1]*scale[1]);
+            vertices.push(vertexPositions[i+2]);
+        }
+
+        const indices = [
+            0, 1, 2, 0, 2, 3,
+        ];
+
+        const normals = [
+            0.0, 0.0, 1.0,
+            0.0, 0.0, 1.0,
+            0.0, 0.0, 1.0,
+            0.0, 0.0, 1.0,
+        ];
+        
+        const textureCoordinates = [
+            0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0,
+        ];
+
+        return new Model(vertices, indices, normals, textureCoordinates, position, rotation, scale);
+    }
 }
 
 

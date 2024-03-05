@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nasa</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <div id="HOME">
+        <a href="../index.html">
+            <img src="https://i.kym-cdn.com/entries/icons/original/000/000/142/feelsgoodman.png" width="40" height="20">
+        </a>
+    </div>
+    <h2>🃏</h2>
+    <canvas width="1080" height="720" class="img" onmousedown="mouseDown(event)", onmousemove="mouseMove(event)" onmouseup="mouseUp(event)" oncontextmenu="event.preventDefault();">:(</canvas>
+    <div style="display: flex; justify-content: center; align-items: center;">
+        <button style="padding-top: 1%; padding-bottom: 1%; padding-left: 2%; padding-right: 2%;" onclick="flipDrawPile()">Flip discard pile</button>
+        <p>&ensp;Autowin:<input type="checkbox" checked onchange="autowin = this.checked"></p>
+    </div>
+    <h3>♠️♥️♦️♣️</h3>
+    <h2>Inte mitt ansvar att du ska kunna reglerna.</h2>
+    <script src="solitaireV3.js"></script>
+</body>

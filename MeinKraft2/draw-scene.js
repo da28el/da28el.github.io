@@ -1,5 +1,7 @@
-function drawScene(gl, programInfo, buffer, camera, chunks) {
-    gl.clearColor(0.2, 0.2, Math.cos(performance.now() / 10000)*0.5 + 0.5, 1.0); // Clear to black, fully opaque
+import { CHUNK_SIZE } from "./world.js";
+
+function drawScene(gl, programInfo, buffer, camera, world, selected) {
+    gl.clearColor(0.2, 0.2, 0.8, 1.0); // Clear to black, fully opaque
     gl.clearDepth(1.0); // Clear everything
     gl.enable(gl.DEPTH_TEST); // Enable depth testing
     gl.depthFunc(gl.LESS); // Near things obscure far things
@@ -24,10 +26,10 @@ function drawScene(gl, programInfo, buffer, camera, chunks) {
     // and we only want to see objects between 0.1 units
     // and 100 units away from the camera.
   
-    const fieldOfView = (45 * Math.PI) / 180; // in radians
+    const fieldOfView = (70 * Math.PI) / 180; // in radians
     const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
     const zNear = 0.1;
-    const zFar = 250.0;
+    const zFar = 300.0;
     const projectionMatrix = mat4.create();
   
     // shared uniform matrices
@@ -37,12 +39,12 @@ function drawScene(gl, programInfo, buffer, camera, chunks) {
     mat4.lookAt(viewMatrix, camera.position, camera.target(), camera.WORLD_UP);
 
     // attributes
-    setPositionAttribute(gl, buffer, programInfo);
-    setTextureAttribute(gl, buffer, programInfo);
-
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.indices);
+    setPositionAttribute(gl, buffer[0], programInfo);
+    setTextureAttribute(gl, buffer[0], programInfo);
+    setNormalAttribute(gl, buffer[0], programInfo);
     
-    setNormalAttribute(gl, buffer, programInfo);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer[0].indices);
+    
 
     gl.useProgram(programInfo.program);
 
@@ -58,25 +60,49 @@ function drawScene(gl, programInfo, buffer, camera, chunks) {
     );
 
 
-    // draw
-    for(let i = 0; i < chunks.length; i++)
+    // draw cubes
+    for(let chunk of world.chunks)
     {
-        let blocks = chunks[i].blocks;
-        for(let j = 0; j < blocks.length; j++)
+        if(chunk == null) continue;
+        // frustum culling
+        let dx = chunk.x + CHUNK_SIZE/2 - camera.position[0];
+        let dz = chunk.z + CHUNK_SIZE/2 - camera.position[2];
+        let distance = [dx, dz];
+        let norm = vec2.normalize(vec2.create(), distance);
+        let dot = vec2.dot(norm, [camera.direction[0], camera.direction[2]]);
+        if(vec2.length(distance) > 4*CHUNK_SIZE && dot < 0.0)
+            continue;
+        // max distance
+        if(vec2.length(distance) > 8*CHUNK_SIZE)
+            continue;
+        for(let block of chunk.blocks)
         {
-            if(blocks[j] == null || blocks[j].id == 0 || !blocks[j].visible) continue;
-            drawModel(gl, programInfo, buffer, camera, blocks[j], viewMatrix);
+            if(block == null || block.id == 0 || !block.visible) continue;
+            drawModel(gl, programInfo, camera, block, viewMatrix);
         }
     }
 
+    // draw HUD
+    gl.disable(gl.DEPTH_TEST);
+    // attributes
+    setPositionAttribute(gl, buffer[1], programInfo);
+    setTextureAttribute(gl, buffer[1], programInfo);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer[1].indices);
+    setNormalAttribute(gl, buffer[1], programInfo);
+
+    drawQuad(gl, programInfo, [-0.6,         -0.9, 0], [0.6/aspect, 0.1, 0], 1); // hotbar
+    drawQuad(gl, programInfo, [-0.85 - (2-selected)/12,   -0.9, 0], [0.06/aspect, 0.06, 0], 2); // highlight
+    drawQuad(gl, programInfo, [-0.85 - 1/12, -0.9, 0], [0.05/aspect, 0.05, 0], 11); // grass
+    drawQuad(gl, programInfo, [-0.85 + 0/12, -0.9, 0], [0.05/aspect, 0.05, 0], 12); // dirt
+    drawQuad(gl, programInfo, [-0.85 + 1/12, -0.9, 0], [0.05/aspect, 0.05, 0], 13); // stone
+
 }
 
-function drawModel(gl, programInfo, buffer, camera, block, viewMatrix) {
+function drawModel(gl, programInfo, camera, block, viewMatrix) {
 
     let modelMatrix = mat4.create();
     let modelPosition = vec3.create();
-    vec3.sub(modelPosition, block.position, camera.position);
-    vec3.scale(modelPosition, modelPosition, 2);
+    vec3.sub(modelPosition, vec3.scale(vec3.create(), block.position, 2), camera.position);
     mat4.translate(
         modelMatrix, // destination matrix
         modelMatrix, // matrix to translate
@@ -93,10 +119,57 @@ function drawModel(gl, programInfo, buffer, camera, block, viewMatrix) {
         modelViewMatrix
     );
 
-    gl.uniform1i(programInfo.uniformLocations.uSampler, block.id);
+    gl.uniform1i(
+        programInfo.uniformLocations.sampler,
+        10+block.id
+    );
+
+    gl.uniform1f(
+        programInfo.uniformLocations.light,
+        block.light
+    );
 
     { // draw
         const vertexCount = 36;
+        const type = gl.UNSIGNED_SHORT;
+        const offset = 0;
+        gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
+    }
+
+}
+
+function drawQuad(gl, programInfo, translation, scale, texture) {
+
+    let modelViewMatrix = mat4.create();
+    mat4.translate(modelViewMatrix, modelViewMatrix, translation);
+    mat4.scale(modelViewMatrix, modelViewMatrix, scale);
+
+    // shared uniforms
+    gl.uniformMatrix4fv(
+        programInfo.uniformLocations.projectionMatrix,
+        false,
+        mat4.create()
+    );
+
+    // unique uniforms
+    gl.uniformMatrix4fv(
+        programInfo.uniformLocations.modelViewMatrix,
+        false,
+        modelViewMatrix
+    );
+
+    gl.uniform1i(
+        programInfo.uniformLocations.sampler, 
+        texture
+    );
+
+    gl.uniform1f(
+        programInfo.uniformLocations.light,
+        1.0
+    );
+
+    { // draw
+        const vertexCount = 6;
         const type = gl.UNSIGNED_SHORT;
         const offset = 0;
         gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);

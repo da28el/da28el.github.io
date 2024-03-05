@@ -7,7 +7,7 @@ let Camera = {
     WORLD_UP: [0, 1, 0],
 
     movementSpeed: 5,
-    mouseSensitivity: 0.5,
+    mouseSensitivity: 0.3,
 
     update: function() {
 
@@ -82,22 +82,22 @@ let Camera = {
         let maxDistance = 100;
         let stepSize = 0.01;
         let step = vec3.create();
-        vec3.scale(step, ray.direction, -stepSize);
+        vec3.scale(step, ray.direction, stepSize);
 
         let hit = null;
 
+        let previous_position = vec3.create();
         for(let i = 0; i < maxDistance / stepSize; i++) {
             vec3.add(ray.position, ray.position, step);
-            let block = world.getBlock(Math.floor(2 * ray.position[0]), Math.floor(2 * ray.position[1]), Math.floor(2 * ray.position[2]));
+            let block = world.getBlock(Math.round(ray.position[0]), Math.round(ray.position[1]), Math.round(ray.position[2]));
             if(block != null && block.id != 0 && block.visible) {
-                hit = {pos: block.position, id: block.id, idx: i, ray};
+                hit = block;
                 break;
+            } else {
+                previous_position = vec3.clone(ray.position);
             }
-        
         }
-
-        return hit;
-
+        return {hit, side: previous_position};
     }
 
 };

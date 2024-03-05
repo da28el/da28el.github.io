@@ -1,0 +1,11 @@
+* wireframe
+* inventory [i] X
+    - quad / html ?  --- quad X texture coords?
+* skybox
+
+* frustum culling X
+* fog
+* shadow mapping ...
+* deferred shading
+* post processing ?
+

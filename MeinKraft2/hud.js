@@ -1,81 +1,28 @@
-function drawModel(gl, programInfo, buffers) {
-    setPositionAttribute(gl, buffers, programInfo);
+let overlay_cycle = 0;
 
-    setTextureAttribute(gl, buffers, programInfo);
+function initOverlay() {
+    const overlay = document.querySelector("#overlay");
+    const fps_display = document.querySelector("#framerate");
+    const camera_display = document.querySelector("#camera");
+    const chunk_display = document.querySelector("#chunk");
+    const fps_node = document.createTextNode("");
+    const camera_node = document.createTextNode("");
+    const chunk_node = document.createTextNode("");
+    fps_display.appendChild(fps_node);
+    camera_display.appendChild(camera_node);
+    chunk_display.appendChild(chunk_node);
 
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
-    
-    setNormalAttribute(gl, buffers, programInfo);
-
-    gl.useProgram(programInfo.program);
-
-    // uniforms
-    gl.uniformMatrix4fv(
-        programInfo.uniformLocations.projectionMatrix,
-        false,
-        projectionMatrix
-    );
-    gl.uniformMatrix4fv(
-        programInfo.uniformLocations.modelViewMatrix,
-        false,
-        modelViewMatrix
-    );
-    gl.uniformMatrix4fv(
-        programInfo.uniformLocations.normalMatrix,
-        false,
-        normalMatrix
-    );
-    gl.uniform1f(
-        programInfo.uniformLocations.time,
-        performance.now() / 1000
-    );
-
-    { // draw
-        const vertexCount = block.model.indices.length;
-        const type = gl.UNSIGNED_SHORT;
-        const offset = 0;
-        gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
-    }
-
+    return {fps_node, camera_node, chunk_node};
 }
 
-// Tell WebGL how to pull out the positions from the position
-// buffer into the vertexPosition attribute.
-function setPositionAttribute(gl, buffers, programInfo) {
-    const numComponents = 2; // pull out 2 values per iteration
-    const type = gl.FLOAT; // the data in the buffer is 32bit floats
-    const normalize = false; // don't normalize
-    const stride = 0; // how many bytes to get from one set of values to the next
-    // 0 = use type and numComponents above
-    const offset = 0; // how many bytes inside the buffer to start from
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
-    gl.vertexAttribPointer(
-        programInfo.attribLocations.vertexPosition,
-        numComponents,
-        type,
-        normalize,
-        stride,
-        offset
-    );
-    gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
+function updateOverlay(overlays, deltaTime, Camera, world, visible) {
+    overlay.style.display = visible ? "block" : "none";
+    if(overlay_cycle++ % 10 == 0)
+        overlays.fps_node.nodeValue = (1 / deltaTime).toFixed(2);
+    overlays.camera_node.nodeValue = Camera.position[0].toFixed(2) + ", " + Camera.position[1].toFixed(2) + ", " + Camera.position[2].toFixed(2);
+    let player_chunk = world.getChunk(Camera.position[0], Camera.position[2]);
+    if(player_chunk != null)
+        overlays.chunk_node.nodeValue = player_chunk.x + ", " + player_chunk.z;
 }
 
-function setTextureAttribute(gl, buffers, programInfo) {
-    const numComponents = 2; // pull out 2 values per iteration
-    const type = gl.FLOAT; // the data in the buffer is 32bit floats
-    const normalize = false; // don't normalize
-    const stride = 0; // how many bytes to get from one set of values to the next
-    const offset = 0; // how many bytes inside the buffer to start from
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.textureCoord);
-    gl.vertexAttribPointer(
-        programInfo.attribLocations.textureCoord,
-        numComponents,
-        type,
-        normalize,
-        stride,
-        offset
-    );
-    gl.enableVertexAttribArray(programInfo.attribLocations.textureCoord);
-}
-
-export { drawScene };
+export { initOverlay, updateOverlay };

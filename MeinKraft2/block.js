@@ -1,4 +1,4 @@
-import { Model } from "./model.js";
+import { CHUNK_HEIGHT } from "./world.js";
 
 class Block {
 
@@ -13,6 +13,7 @@ class Block {
         this.position = position;
         this.id = id;
         this.visible = true;
+        this.light = 0.0;//position[1]/CHUNK_HEIGHT;
     }
 
 }

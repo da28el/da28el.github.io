@@ -13,8 +13,10 @@ let Mouse = {
         return this._pressed[keyCode];
     },
     onKeyDown: function(event) {
-        canvas.requestPointerLock();
-        this._pressed[event.button] = true;
+        if (document.pointerLockElement !== canvas)
+            canvas.requestPointerLock();
+        else
+            this._pressed[event.button] = true;
     },  
     onKeyUp: function(event) {
         delete this._pressed[event.button];
@@ -37,14 +39,26 @@ let Mouse = {
         this.y = 0;
         this.dx = 0;
         this.dy = 0;
+    },
+    requestFullscreen() {
+        const element = document.querySelector("canvas");
+        if(element.requestFullscreen) {
+            element.requestFullscreen();
+        } else if(element.mozRequestFullScreen) {
+            element.mozRequestFullScreen();
+        } else if(element.webkitRequestFullscreen) {
+            element.webkitRequestFullscreen();
+        } else if(element.msRequestFullscreen) {
+            element.msRequestFullscreen();
+        }
     }
 };
 
 const canvas = document.querySelector("#glcanvas");
 
-canvas.addEventListener('mouseup', function(event) { Mouse.onKeyUp(event); });
-canvas.addEventListener('mousedown', function(event) { Mouse.onKeyDown(event); });
-canvas.addEventListener('mousemove', function(event) { Mouse.onMouseMove(event); });
-canvas.addEventListener('mouseleave', function(event) { Mouse.onMouseLeave(event); });
+canvas.addEventListener('mouseup',      function(event) { Mouse.onKeyUp(event);     });
+canvas.addEventListener('mousedown',    function(event) { Mouse.onKeyDown(event);   });
+canvas.addEventListener('mousemove',    function(event) { Mouse.onMouseMove(event); });
+canvas.addEventListener('mouseleave',   function(event) { Mouse.onMouseLeave(event);});
 
 export { Mouse };

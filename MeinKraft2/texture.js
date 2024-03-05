@@ -55,19 +55,39 @@ function loadTexture(gl, url) {
 
 function loadTextures(gl) {
     gl.activeTexture(gl.TEXTURE1);
+    const texture_hotbar = loadTexture(gl, "textures/hotbar.png");
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.bindTexture(gl.TEXTURE_2D, texture_hotbar);
+
+    gl.activeTexture(gl.TEXTURE2);
+    const texture_highlight = loadTexture(gl, "textures/highlight.png");
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.bindTexture(gl.TEXTURE_2D, texture_highlight);
+
+    gl.activeTexture(gl.TEXTURE11);
     const texture_grass = loadTexture(gl, "textures/grass.png");
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     gl.bindTexture(gl.TEXTURE_2D, texture_grass);
 
-    gl.activeTexture(gl.TEXTURE2);
+    gl.activeTexture(gl.TEXTURE12);
     const texture_dirt = loadTexture(gl, "textures/dirt.png");
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     gl.bindTexture(gl.TEXTURE_2D, texture_dirt);
 
-    gl.activeTexture(gl.TEXTURE3);
+    gl.activeTexture(gl.TEXTURE13);
     const texture_stone = loadTexture(gl, "textures/stone.png");
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     gl.bindTexture(gl.TEXTURE_2D, texture_stone);
+
+    gl.activeTexture(gl.TEXTURE0);
+
+    return {
+        1: texture_hotbar,
+        2: texture_highlight,
+        11: texture_grass,
+        12: texture_dirt,
+        13: texture_stone,
+    };
 }
 
 export { loadTextures };
