@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebGL2</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        table, th, td {
+            border: 2px solid black;
+            border-collapse: collapse;
+        }
+        textarea {
+            resize: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="HOME">
+        <a href="../index.html">
+            <img src="https://i.kym-cdn.com/entries/icons/original/000/000/142/feelsgoodman.png" width="40" height="20">
+        </a>
+    </div>
+    <h2>Shaders</h2>
+    <div style="display: flex; justify-content: center;">
+        <canvas id="canvas" width="720" height="720">:(</canvas>
+<textarea id="shader" cols="80" spellcheck="false">
+varying highp vec2 vPos;
+varying float fTime;
+
+void main() {
+    vec3 color = (vec3(vPos, 0.0)+1.0)/2.0;
+    float dist = length(vPos);
+    if(dist < 0.25*sin(fTime)+0.5)
+        color = vec3(1.0)-vec3(vPos, 0.0);
+    
+    if (dist > 0.75*cos(fTime)+0.5)
+        color = color + 1.0;
+    
+    gl_FragColor = vec4(color, 1.0);
+}
+</textarea>
+    </div>
+    <br>
+    <button onclick="main()" class="img" style="width: 10%; height: 40px;">Render (ctrl-enter)</button>
+    <h3>Varför ska jag alltid göra allt jobb? Det är din tur att skriva kod nu.</h3>
+    <h3>Tar en liten paus i drönarna medan jag fixar NEAT😎</h3>
+    <h3>Dags att utnyttja 📈ℹ️k💳et</h3>
+    <br>
+    <h3>Koden skrivs i GLSL, ett språk för beräkningar på grafikkortet med inbyggd linjär algebra. Syntaxen är baserad på C och viktigt att veta är att man alltid måste använda doubles. (ex: x/2.0 och y*4.0)</h3>
+    <h3>Här är inputs (uniforms) du kan använda:</h3>
+    <table>
+        <tr>
+            <th>Uniform</th>
+            <th>Värde</th>
+        </tr>
+        <tr>
+            <td>vec2 vPos</td>
+            <td>Normaliserade 2D koordinater för pixeln</td>
+        </tr>
+        <tr>
+            <td>float fTime</td>
+            <td>Tid sedan start (funkar bra med sin & cos för periodiska animationer)</td>
+        </tr>
+        <tr>
+            <td>vec2 vResolution</td>
+            <td>Upplösningen på canvasen (w, h) = (480, 480)</td>
+        </tr>
+        <tr>
+            <td>vec3 vMouse</td>
+            <td>2D koordinater för musen (x, y) och click (z = 0.0, 1.0), normaliseras lätt med vResolution:<br>
+<textarea cols="65" rows="1" spellcheck="false" readonly="true">vec2 mouse = (vMouse.xy/vResolution - vec2(0.5)) * vec2(2.0, -2.0);</textarea>
+            </td>
+        </tr>
+    </table>
+    <h4>Alla uniforms skickas via vertex-shadern och har därför 'varying' istället för 'uniform'. Det gå att använda highp/mediump men behövs inte. Om du fattar så fattar du, kolla exemplen annars och lista ut det.</h4>
+    <h3>koordinatsystem</h3>
+    <img src=".\coordinates.png" width="400" style="margin-top: -10px; margin-bottom: -20px;">
+    <h4>Röd: screenspace (vResolution & vMouse)<br>Blå: clipspace (vPos)</h4>
+    <h3>Säg till om jag ska fixa fler uniforms.</h3>
+    <h3>Gör nåt coolt! (Om du kan...)</h3>
+    <h3>
+        Ex (copy-paste):
+    </h3>
+    <table>
+        <tr>
+            <th>Basics</th>
+            <th>vMouse och vResolution (tryck någonstans på bilden)</th>
+            <th>Mandelbrot</th>
+        </tr>
+        <tr>
+            <td>
+<textarea cols="50" rows="28" spellcheck="false" readonly="true">
+varying highp vec2 vPos;
+varying float fTime;
+
+void main() {
+    vec3 color = vec3(0.0);
+    
+    if(vPos.x > 0.0) color += vec3(1.0, 0.0, 0.0);
+    if(vPos.y > 0.0) color += vec3(0.0, 1.0, 0.0);    
+    
+    /**
+    *    Här kan vi se att vPos ger oss
+    *    normaliserade koordinater x, y ∈ [-1, 1]
+    */
+    
+    gl_FragColor = vec4(color, 1.0);
+}
+</textarea>
+            </td>
+            <td>
+<textarea cols="70" rows="28" spellcheck="false" readonly="true">
+varying highp vec2 vPos;
+varying float fTime;
+varying vec2 vResolution;
+varying vec3 vMouse;
+
+vec3 demo1(vec2 mouse) {
+    vec3 rv = vec3(0.0);    
+    if(vMouse.z > 0.5){
+        float dist = length(vPos-mouse);
+        rv = vec3(1.0)-vec3(dist);
+    }
+    return rv;
+}
+
+vec3 demo2() {
+    vec3 rv = vec3(0.0);
+    rv = vMouse/vec3(vResolution, 1.0);
+    return rv;
+}
+
+void main() {
+    vec2 mouse = (vMouse.xy/vResolution - vec2(0.5)) * vec2(2.0, -2.0);
+    vec3 color = demo1(mouse);
+    color *= demo2();
+
+    gl_FragColor = vec4(color, 1.0);
+}
+</textarea>
+            </td>
+            <td>
+<textarea cols="50" rows="28" spellcheck="false" readonly="true">
+varying highp vec2 vPos;
+varying float fTime;
+  
+void main() {
+    vec2 z = 0.0/vPos.xy;
+    vec2 c = 0.37001+10.0*exp(-0.5*fTime)*vPos.xy;
+    vec3 j;
+    for(float i = 0.0; i <= 256.0; i++){
+        z = mat2(z, -z.y, z.x) * z + c; 
+        if(dot(z,z) > 16.0) break;
+        j = vec3(i)/(256.0);
+    }
+    gl_FragColor = vec4(j, 1.0);
+}
+</textarea>
+            </td>
+        </tr>
+    </table>
+    <script src="shade.js"></script>
+</body>
