@@ -1,18 +1,17 @@
 const fsSource = 
 `
-precision mediump float;
-
 varying highp vec2 vTextureCoord;
-varying highp vec3 vNormal;
+varying highp vec3 vLighting;
 
 uniform sampler2D uSampler;
-uniform float uLight;
+
+precision mediump float;
 
 void main()
 {
     highp vec4 texelColor = texture2D(uSampler, vTextureCoord);
     
-    gl_FragColor = vec4(texelColor.rgb * uLight, texelColor.a);
+    gl_FragColor = vec4(texelColor.rgb * vLighting, texelColor.a);
 }
 `;
 

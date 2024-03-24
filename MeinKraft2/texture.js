@@ -54,12 +54,12 @@ function loadTexture(gl, url) {
 }
 
 function loadTextures(gl) {
-    gl.activeTexture(gl.TEXTURE1);
+    gl.activeTexture(gl.TEXTURE0);
     const texture_hotbar = loadTexture(gl, "textures/hotbar.png");
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     gl.bindTexture(gl.TEXTURE_2D, texture_hotbar);
 
-    gl.activeTexture(gl.TEXTURE2);
+    gl.activeTexture(gl.TEXTURE1);
     const texture_highlight = loadTexture(gl, "textures/highlight.png");
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     gl.bindTexture(gl.TEXTURE_2D, texture_highlight);
@@ -79,11 +79,9 @@ function loadTextures(gl) {
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     gl.bindTexture(gl.TEXTURE_2D, texture_stone);
 
-    gl.activeTexture(gl.TEXTURE0);
-
     return {
-        1: texture_hotbar,
-        2: texture_highlight,
+        0: texture_hotbar,
+        1: texture_highlight,
         11: texture_grass,
         12: texture_dirt,
         13: texture_stone,

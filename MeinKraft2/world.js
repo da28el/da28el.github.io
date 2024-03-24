@@ -18,12 +18,10 @@ class World {
                 this.chunks[World.IDX(x, z)] = new Chunk(x, z);
             }
         }
-        for(let i = 0; i < 2; i++)
-            for(let chunk of this.chunks) 
-                for(let block of chunk.blocks)
-                    if(block != null)
-                        this.updateBlock(block.position[0], block.position[1], block.position[2]);
-
+        for(let chunk of this.chunks) 
+            for(let block of chunk.blocks)
+                if(block != null)
+                    this.updateBlock(block.position[0], block.position[1], block.position[2]);
         console.log("world generated");
     }
 
@@ -48,60 +46,45 @@ class World {
         if (block == null) return;
         if (block.id == Block.IDs.AIR) return;
         this.setBlock(x, y, z, new Block([x, y, z], Block.IDs.AIR));
-        this.updateNeighbors(x, y, z);
-    }
-
-    placeBlockId(x, y, z, id) {
-        let block = this.getBlock(x, y, z);
-        if (block == null) return;
-        if (block.id != Block.IDs.AIR) return;
-        this.setBlock(x, y, z, new Block([x, y, z], id));
-        this.updateBlock(x, y, z);
-        this.updateNeighbors(x, y, z);
-    }
-
-    getNeighbors(x, y, z) {
-        return [
-            this.getBlock(x + 1, y, z),
-            this.getBlock(x - 1, y, z),
-            this.getBlock(x, y + 1, z),
-            this.getBlock(x, y - 1, z),
-            this.getBlock(x, y, z + 1),
-            this.getBlock(x, y, z - 1),
-        ];
-    }
-
-    updateBlock(x, y, z){
-        const block = this.getBlock(x, y, z);
-        if (block == null) return;
-        
-        let neighbors = this.getNeighbors(x, y, z);
-        
-        // visibility
-        block.visible = false; // default to false
-        if (block.id != Block.IDs.AIR) { // if not air, check if any neighbors are air
-            for (let i = 0; i < neighbors.length; i++) {
-                if (neighbors[i] && (neighbors[i].id == Block.IDs.AIR)) // if neighbor is air, set visible to true
-                    block.visible = true;
-            }
-        }
-
-        // light
-        let maxLight = 0.0;
-        for(let i = 0; i < neighbors.length; i++)
-            if (neighbors[i] && (neighbors[i].light > maxLight))
-                maxLight = neighbors[i].light;
-        block.light = maxLight - 0.1;
-        if(block.id == Block.IDs.STONE) block.light = 1.0;
-    }
-
-    updateNeighbors(x, y, z) {
         this.updateBlock(x + 1, y, z);
         this.updateBlock(x - 1, y, z);
         this.updateBlock(x, y + 1, z);
         this.updateBlock(x, y - 1, z);
         this.updateBlock(x, y, z + 1);
         this.updateBlock(x, y, z - 1);
+    }
+
+    placeBlock(x, y, z, id) {
+        let block = this.getBlock(x, y, z);
+        if (block == null) return;
+        if (block.id != Block.IDs.AIR) return;
+        this.setBlock(x, y, z, new Block([x, y, z], id));
+        this.updateBlock(x + 1, y, z);
+        this.updateBlock(x - 1, y, z);
+        this.updateBlock(x, y + 1, z);
+        this.updateBlock(x, y - 1, z);
+        this.updateBlock(x, y, z + 1);
+        this.updateBlock(x, y, z - 1);
+    }
+
+    updateBlock(x, y, z){
+        const block = this.getBlock(x, y, z);
+        if (block == null) return;
+        block.visible = false;
+        if (block.id != Block.IDs.AIR) {
+            let neighbors = [
+                this.getBlock(x + 1, y, z),
+                this.getBlock(x - 1, y, z),
+                this.getBlock(x, y + 1, z),
+                this.getBlock(x, y - 1, z),
+                this.getBlock(x, y, z + 1),
+                this.getBlock(x, y, z - 1),
+            ];
+            for (let i = 0; i < neighbors.length; i++) {
+                if (neighbors[i] && (neighbors[i].id == Block.IDs.AIR))
+                    block.visible = true;
+            }
+        }
     }
 
 }

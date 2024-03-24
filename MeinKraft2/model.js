@@ -189,10 +189,10 @@ class Model {
         ];
 
         const normals = [
-            0.0, 0.0, 1.0,
-            0.0, 0.0, 1.0,
-            0.0, 0.0, 1.0,
-            0.0, 0.0, 1.0,
+            0.0, 1.0, 0.0, // upward for light temp fix needs own shader
+            0.0, 1.0, 0.0, // upward for light temp fix needs own shader
+            0.0, 1.0, 0.0, // upward for light temp fix needs own shader
+            0.0, 1.0, 0.0, // upward for light temp fix needs own shader
         ];
         
         const textureCoordinates = [

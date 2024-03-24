@@ -41,10 +41,10 @@ function drawScene(gl, programInfo, buffer, camera, world, selected) {
     // attributes
     setPositionAttribute(gl, buffer[0], programInfo);
     setTextureAttribute(gl, buffer[0], programInfo);
-    setNormalAttribute(gl, buffer[0], programInfo);
-    
+
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer[0].indices);
     
+    setNormalAttribute(gl, buffer[0], programInfo);
 
     gl.useProgram(programInfo.program);
 
@@ -90,11 +90,23 @@ function drawScene(gl, programInfo, buffer, camera, world, selected) {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer[1].indices);
     setNormalAttribute(gl, buffer[1], programInfo);
 
-    drawQuad(gl, programInfo, [-0.6,         -0.9, 0], [0.6/aspect, 0.1, 0], 1); // hotbar
-    drawQuad(gl, programInfo, [-0.85 - (2-selected)/12,   -0.9, 0], [0.06/aspect, 0.06, 0], 2); // highlight
+
+    drawQuad(gl, programInfo, [-0.6,         -0.9, 0], [0.6/aspect, 0.1, 0], 0); // hotbar
+    drawQuad(gl, programInfo, [-0.85 - (2-selected)/12,   -0.9, 0], [0.06/aspect, 0.06, 0], 1); // highlight
     drawQuad(gl, programInfo, [-0.85 - 1/12, -0.9, 0], [0.05/aspect, 0.05, 0], 11); // grass
     drawQuad(gl, programInfo, [-0.85 + 0/12, -0.9, 0], [0.05/aspect, 0.05, 0], 12); // dirt
     drawQuad(gl, programInfo, [-0.85 + 1/12, -0.9, 0], [0.05/aspect, 0.05, 0], 13); // stone
+
+
+    /*
+    
+    -0.6-1/3    = -0.9333
+                delta = 0.08333
+    -0.85       = -0.85
+                delta = 0.08333
+    -0.1-2/3    = -0.7666
+    
+    */
 
 }
 
@@ -119,15 +131,7 @@ function drawModel(gl, programInfo, camera, block, viewMatrix) {
         modelViewMatrix
     );
 
-    gl.uniform1i(
-        programInfo.uniformLocations.sampler,
-        10+block.id
-    );
-
-    gl.uniform1f(
-        programInfo.uniformLocations.light,
-        block.light
-    );
+    gl.uniform1i(programInfo.uniformLocations.uSampler, 10+block.id);
 
     { // draw
         const vertexCount = 36;
@@ -158,15 +162,7 @@ function drawQuad(gl, programInfo, translation, scale, texture) {
         modelViewMatrix
     );
 
-    gl.uniform1i(
-        programInfo.uniformLocations.sampler, 
-        texture
-    );
-
-    gl.uniform1f(
-        programInfo.uniformLocations.light,
-        1.0
-    );
+    gl.uniform1i(programInfo.uniformLocations.uSampler, texture);
 
     { // draw
         const vertexCount = 6;

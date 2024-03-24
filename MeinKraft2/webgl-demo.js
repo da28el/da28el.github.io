@@ -8,7 +8,6 @@ import { Key } from "./key.js";
 import { Mouse } from "./mouse.js";
 import { Camera } from "./camera.js";
 import { loadTextures } from "./texture.js";
-import { initOverlay, updateOverlay } from "./hud.js";
 
 import { World } from "./world.js";
 import { Block } from "./block.js";
@@ -16,7 +15,7 @@ import { Model } from "./model.js";
 
 let deltaTime = 0;
 
-let showOverlay = false;
+let debug = false;
 
 main();
 
@@ -26,7 +25,17 @@ main();
 
 function main() {
     // displays
-    const overlays = initOverlay();
+    let cycle = 0;
+    const overlay = document.querySelector("#overlay");
+    const fps_display = document.querySelector("#framerate");
+    const camera_display = document.querySelector("#camera");
+    const chunk_display = document.querySelector("#chunk");
+    const fps_node = document.createTextNode("");
+    const camera_node = document.createTextNode("");
+    const chunk_node = document.createTextNode("");
+    fps_display.appendChild(fps_node);
+    camera_display.appendChild(camera_node);
+    chunk_display.appendChild(chunk_node);
 
     const canvas = document.querySelector("#glcanvas");
     // Initialize the GL context
@@ -69,8 +78,7 @@ function main() {
         uniformLocations: {
             projectionMatrix: gl.getUniformLocation(shaderProgram, "uProjectionMatrix"),
             modelViewMatrix: gl.getUniformLocation(shaderProgram, "uModelViewMatrix"),
-            sampler: gl.getUniformLocation(shaderProgram, "uSampler"),
-            light: gl.getUniformLocation(shaderProgram, "uLight"),
+            uSampler: gl.getUniformLocation(shaderProgram, "uSampler"),
             time: gl.getUniformLocation(shaderProgram, "uTime"),
         },
     };
@@ -112,7 +120,7 @@ function main() {
                 let x = Math.round(ray.side[0]);
                 let y = Math.round(ray.side[1]);
                 let z = Math.round(ray.side[2]);
-                world.placeBlockId(x, y, z, placeBlock);
+                world.placeBlock(x, y, z, placeBlock);
             }
         }
 
@@ -131,13 +139,20 @@ function main() {
         // gldraw
         drawScene(gl, programInfo, buffers, Camera, world, placeBlock);
 
-        // overlay
+        // debug
         if(Key.isDown(Key.L)) {
-            showOverlay = !showOverlay;
+            debug = !debug;
             Key.release(Key.L);
         }
-        
-        updateOverlay(overlays, deltaTime, Camera, world, showOverlay);
+        // update displays
+        overlay.style.display = debug ? "block" : "none";
+        if(debug) {
+            if(cycle++ % 10 == 0) fps_node.nodeValue = (1 / deltaTime).toFixed(2);
+            camera_node.nodeValue = Camera.position[0].toFixed(2) + ", " + Camera.position[1].toFixed(2) + ", " + Camera.position[2].toFixed(2);
+            let player_chunk = world.getChunk(Camera.position[0], Camera.position[2]);
+            if(player_chunk != null)
+            chunk_node.nodeValue = player_chunk.x + ", " + player_chunk.z;
+        }
     
         requestAnimationFrame(render);
     }
