@@ -1,133 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Da28el</title>
-        <link rel="stylesheet" href="style.css">
-    </head>
-    <body>
-        <div id="HOME">
-            <img src="https://i.kym-cdn.com/entries/icons/original/000/000/142/feelsgoodman.png" width="40" height="20">
-        </div>
-        <h1>HOMEPAGE</h1>
-        <hr>
-        <img src="./VEGGIE-D.jpg" width="200" class="img">
-        <div id="BALL">
-            <h3>Ball:</h3>
-            <a href="ball/ball.html">
-                <img src="ball/ball.png" href="ball/ball.html">
-            </a>
-            <br>
-        </div>
-        <div id="COLOR">
-            <h3>Color:</h3>
-            <a href="color/color.html">
-                <img src="color/color.png" href="color/color.html">
-            </a>
-        </div>
-        <div id="RAYCAST">
-            <h3>Raycast:</h3>
-            <a href="raycast/raycast.html">
-                <img src="raycast/raycast.png" href="raycast/raycast.html">
-            </a>
-        </div>
-        <div id="PIXEL">
-            <h3>PIXEL ART:</h3>
-            <a href="pixel/pixel.html">
-                <img src="pixel/pixel.png" href="pixel/pixel.html">
-            </a>
-        </div>
-        <div id="PHONE">
-            <h3 id="onPhone">PHONE:</h3>
-            <a href="phone/phone.html">
-                <img src="phone/phone.png" href="phone/phone.html">
-            </a>
-        </div>
-        <div id="SOLAR">
-            <h3>SOLAR:</h3>
-            <a href="solar/solar.html">
-                <img src="solar/solar.png" href="solar/solar.html">
-            </a>
-        </div>
-        <div id="COLLISION">
-            <h3>COLLISION:</h3>
-            <a href="collision/collision.html">
-                <img src="collision/collision.png" href="collision/collision.html">
-            </a>
-        </div>
-        <div id="MONTECARLO">
-            <h3>Monte Carlo:</h3>
-            <a href="montecarlo/montecarlo.html">
-                <img src="montecarlo/montecarlo.png" href="montecarlo/montecarlo.html">
-            </a>
-        </div>
-        <div id="NASA">
-            <h3>National Aeronautic and Space Administration:</h3>
-            <a href="nasa/nasa.html">
-                <img src="nasa/nasa.png" href="nasa/nasa.html">
-            </a>
-        </div>
-        <div id="VPL">
-            <h3>Visual Programming Language</h3>
-            <a href="VPL/VPL.html">
-                <img src="VPL/VPL.png" href="VPL/VPL.html">
-            </a>
-        </div>
-        <div id="3D">
-            <h3>3D</h3>
-            <a href="3d/3d.html">
-                <img src="3d/3d.png" href="3d/3d.html">
-            </a>
-        </div>
-        <div id="4DAN">
-            <h3>4Dan</h3>
-            <a href="4dan/4dan.html">
-                <img src="4dan/4dan.png" href="4dan/4dan.html" width="500" height="500">
-            </a>
-        </div>
-        <iframe title="vimeo-player" src="https://player.vimeo.com/video/700914955?h=ae3725c82c" width="640" height="360" frameborder="0" allowfullscreen></iframe>
-        <div id="FLUID">
-            <h3>Navier Stokes</h3>
-            <a href="fluid/fluid.html">
-                <img src="fluid/fluid.png" href="fluid/fluid.html">
-            </a>
-        </div>
-        <div id="kinematics">
-            <h3>IK</h3>
-            <a href="kinematics/kinematics.html">
-                <img src="kinematics/kinematics.png" href="kinematics/kinematics.html">
-            </a>
-        </div>
-        <div id="dino">
-            <h3>DINO</h3>
-            <a href="dino/dino.html">
-                <img src="dino/dino.png" href="dino/dino.html">
-            </a>
-        </div>
-        <div id="meinkraft2">
-            <h3>minecraft.net</h3>
-            <a href="MeinKraft2/index.html">
-                <img src="MeinKraft2/meinkraft2.png" href="MeinKraft2/index.html" width="480">
-            </a>
-        </div>
-        <div id="solitaire">
-            <h3>Solitaire with Friends</h3>
-            <a href="solitaire/solitaire.html">
-                <img src="solitaire/solitaire.png" href="solitaire/solitaire.html" width="480">
-            </a>
-        </div>
-        <div id="darwin">
-            <h3>Darwinism</h3>
-            <a href="darwin/darwin.html">
-                <img src="darwin/evolution.png" href="darwin/darwin.html" width="480">
-            </a>
-        </div>
-        <div id="Shade">
-            <h3>Shaders</h3>
-            <a href="shade/shade.html">
-                <img src="shade/shade.jpg" href="shade/shade.html" width="480">
-            </a>
-        </div>
-    </body>
+	<head>
+		<meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>My first three.js app</title>
+		<style>
+			body { 
+                overflow-x: hidden;
+                margin: 0;
+                font-family: monospace;
+                color: white;
+            }
+
+            canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+            }
+
+            main {
+                width: 100vw;
+                height: 200vw;
+                z-index: 99;
+                position: absolute;
+                justify-content: center;
+                text-align: center;
+                pointer-events: none;
+                font-size: 5vh;
+            }
+
+            section {
+                min-height: 100vh;
+                padding: 20px;
+                font-size: 4vh;
+            }
+
+            #scrollProgress {
+                position: fixed;
+                bottom: 10px;
+                left: 10px;
+                z-index: 99;
+                font-size: 3vh;
+            }
+		</style>
+        <script type="importmap">
+            {
+              "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+              }
+            }
+          </script>
+	</head>
+	<body>
+        <span id="scrollProgress"></span>
+        <main>
+            <section></section>
+            <section></section>
+            <section></section>
+            <section></section>
+            <section></section>
+        </main>
+		<script type="module" src="./main.js"></script>
+	</body>
 </html>

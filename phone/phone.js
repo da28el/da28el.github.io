@@ -16,7 +16,7 @@ var ongoingTouches = [];
 function startup() {
     if (!detectMob()) {
         var r = confirm("Get on ur phone if u want to play with me ;)");
-        if(r) window.location.href = '../index.html';
+        if(r) window.location.href = '../homepage.html';
     }
     var el = document.getElementById("canvas");
     el.addEventListener("touchstart", handleStart, false);
