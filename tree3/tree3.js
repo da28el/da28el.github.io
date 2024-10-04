@@ -2,7 +2,7 @@ let canvas = document.querySelector('canvas');
 let ctx = canvas.getContext('2d');
 let width = canvas.width; // = window.innerWidth;
 let height = canvas.height; // = window.innerHeight;
-canvas.oncontextmenu = function(e) { e.preventDefault(); e.stopPropagation(); }
+canvas.oncontextmenu = function (e) { e.preventDefault(); e.stopPropagation(); }
 
 // CONFIG
 const nodeSize = 8;
@@ -11,6 +11,12 @@ const labelSelectorOffsetX = 20;
 const labelSelectorOffsetY = 30;
 const labelSelectorBreakRange = 50;
 
+const LABEL_COLOR = {
+    0: "rgba(0,0,0,0.1)",
+    1: "rgb(0,255,0)", // green
+    2: "rgb(255,0,0)", // red
+    3: "rgb(0,0,255)"  // blue
+};
 
 // Globals
 let TREE_n = 1;
@@ -19,25 +25,36 @@ let nodeColliders = [];
 let labelColliders = [];
 let trees = [];
 
-const TNode = (x, y, color, children = []) => {
+const TNode = (x, y, label, children = []) => {
     return {
         x: x,
         y: y,
-        color: color,
+        label: label,
         children: children
     }
 }
 
+function countNodes(root) {
+    let nodes = []
+    const dfs = (n) => {
+        if (n == 0) return
+        nodes.push(n)
+        n.children.forEach(c => dfs(c)) 
+    }
+    dfs(root)
+    return nodes.length
+}
+
 function inf_embedded(rootNode1, rootNode2) {
-    
+
 }
 
 function submitTree(rootNode) {
-    
+
 }
 
-const Collider = (x, y, r, color, parent = null) => {
-    return { x, y, r, color, parent }
+const Collider = (x, y, r, label, parent = null) => {
+    return { x, y, r, label, parent }
 }
 
 function addChild(parent, child) {
@@ -53,7 +70,7 @@ function addChild(parent, child) {
 function generateNodeColliders() {
     nodeColliders = [];
     nodes.forEach(element => {
-        nodeColliders.push(Collider(element.x, element.y, nodeSize, element.color, element));
+        nodeColliders.push(Collider(element.x, element.y, nodeSize, element.label, element));
     });
 }
 
@@ -71,30 +88,34 @@ function getCollision(colliders) {
     return null;
 }
 
-function drawCollider(collider, color) {
-    ctx.fillStyle = color;
+function drawCollider(collider, label) {
+    ctx.fillStyle = LABEL_COLOR[label];
     ctx.beginPath();
     ctx.arc(collider.x, collider.y, collider.r, 0, 2 * Math.PI);
     ctx.fill();
+    if (collider == nodeColliders[0]) {
+        ctx.fillStyle = "#000000";
+        ctx.fillText("ROOT", collider.x-15, collider.y-10)
+    }
 }
 
 function generateLabelColliders() {
     // label-break-range
-    labelColliders.push(Collider(MouseLogic.lastClickX, MouseLogic.lastClickY, labelSelectorBreakRange, "rgba(0,0,0,0.1)"));
+    labelColliders.push(Collider(MouseLogic.lastClickX, MouseLogic.lastClickY, labelSelectorBreakRange, 0));
     switch (TREE_n) {
         case 1:
-            labelColliders.push(Collider(MouseLogic.lastClickX, MouseLogic.lastClickY - labelSelectorOffsetY, labelSelectorSize, "rgb(0,255,0)"));
+            labelColliders.push(Collider(MouseLogic.lastClickX, MouseLogic.lastClickY - labelSelectorOffsetY, labelSelectorSize, 1));
             break;
 
         case 2:
-            labelColliders.push(Collider(MouseLogic.lastClickX - labelSelectorOffsetX, MouseLogic.lastClickY - labelSelectorOffsetY * 2 / 3, labelSelectorSize, "rgb(0,255,0)"));
-            labelColliders.push(Collider(MouseLogic.lastClickX + labelSelectorOffsetX, MouseLogic.lastClickY - labelSelectorOffsetY * 2 / 3, labelSelectorSize, "rgb(255,0,0)"));
+            labelColliders.push(Collider(MouseLogic.lastClickX - labelSelectorOffsetX, MouseLogic.lastClickY - labelSelectorOffsetY * 2 / 3, labelSelectorSize, 1));
+            labelColliders.push(Collider(MouseLogic.lastClickX + labelSelectorOffsetX, MouseLogic.lastClickY - labelSelectorOffsetY * 2 / 3, labelSelectorSize, 2));
             break;
 
         case 3:
-            labelColliders.push(Collider(MouseLogic.lastClickX - labelSelectorOffsetX * 1.5, MouseLogic.lastClickY - labelSelectorOffsetY / 2, labelSelectorSize, "rgb(0,255,0)"));
-            labelColliders.push(Collider(MouseLogic.lastClickX, MouseLogic.lastClickY - labelSelectorOffsetY, labelSelectorSize, "rgb(255,0,0)"));
-            labelColliders.push(Collider(MouseLogic.lastClickX + labelSelectorOffsetX * 1.5, MouseLogic.lastClickY - labelSelectorOffsetY / 2, labelSelectorSize, "rgb(0,0,255)"));
+            labelColliders.push(Collider(MouseLogic.lastClickX - labelSelectorOffsetX * 1.5, MouseLogic.lastClickY - labelSelectorOffsetY / 2, labelSelectorSize, 1));
+            labelColliders.push(Collider(MouseLogic.lastClickX, MouseLogic.lastClickY - labelSelectorOffsetY, labelSelectorSize, 2));
+            labelColliders.push(Collider(MouseLogic.lastClickX + labelSelectorOffsetX * 1.5, MouseLogic.lastClickY - labelSelectorOffsetY / 2, labelSelectorSize, 3));
             break;
     }
 }
@@ -102,41 +123,55 @@ function generateLabelColliders() {
 function drawLabelSelection() {
 
     labelColliders.forEach(element => {
-        drawCollider(element, element.color);
+        drawCollider(element, element.label);
     });
 
 }
 
 function drawNodes() {
     nodeColliders.forEach(element => {
-        drawCollider(element, element.color);
+        drawCollider(element, element.label);
     });
 }
 
 function drawLines() {
-    if (MouseLogic.connectingFrom != null) {
+    const arrow = (x1, y1, x2, y2) => {
+        const theta = 2.5*Math.PI/3
         ctx.strokeStyle = "#000000";
         ctx.beginPath();
-        ctx.moveTo(MouseLogic.connectingFrom.x, MouseLogic.connectingFrom.y);
-        ctx.lineTo(MouseLogic.x, MouseLogic.y);
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        let dx = x2 - x1;
+        let dy = y2 - y1;
+        let r = Math.sqrt(dx*dx+dy*dy);
+        dx = 20*dx/r;
+        dy = 20*dy/r;
+        ctx.moveTo(x2, y2);
+        ctx.lineTo(x2 + dx * Math.cos(theta) - dy * Math.sin(theta), y2 + dx * Math.sin(theta) + dy * Math.cos(theta))
+        ctx.moveTo(x2, y2);
+        ctx.lineTo(x2 + dx * Math.cos(-theta) - dy * Math.sin(-theta), y2 + dx * Math.sin(-theta) + dy * Math.cos(-theta))
         ctx.stroke();
+    };
+
+    if (MouseLogic.connectingFrom != null) {
+        arrow(MouseLogic.connectingFrom.x, MouseLogic.connectingFrom.y, MouseLogic.x, MouseLogic.y);
     }
     nodes.forEach(element => {
         element.children.forEach(child => {
-            ctx.strokeStyle = "#000000";
-            ctx.beginPath();
-            ctx.moveTo(element.x, element.y);
-            ctx.lineTo(child.x, child.y);
-            ctx.stroke();
+            arrow(element.x, element.y, child.x, child.y);
         });
     });
 }
 
 function drawBackground() {
     ctx.fillStyle = "rgb(240,240,210";
-    ctx.fillRect(0, 0, width * 2 / 3, height);
-    ctx.fillStyle = "rgb(140,140,110";
-    ctx.fillRect(width * 2 / 3, 0, width, height);
+    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = "rgba(0,255,0,0.5)";
+    ctx.fillRect(width * 2 / 3, 0, width, height / 3);
+    ctx.fillStyle = "rgba(255,0,0,0.5)";
+    ctx.fillRect(width * 2 / 3, height / 3, width, height * 2 / 3);
+    ctx.fillStyle = "rgba(0,0,255,0.5)";
+    ctx.fillRect(width * 2 / 3, height * 2 / 3, width, height);
 }
 
 
@@ -150,7 +185,10 @@ const MouseLogic = {
     connectingFrom: null,
     movingNode: null,
     mouseDown: (e) => {
-        if (MouseLogic.x > width * 2/3) MouseLogic.mouseOOB();
+        if (MouseLogic.x > width * 2 / 3) {
+            MouseLogic.mouseOOB();
+            return;
+        }
 
         if (e.button == 2) {
             let collision = getCollision(nodeColliders);
@@ -175,7 +213,10 @@ const MouseLogic = {
 
     },
     mouseUp: (e) => {
-        if (MouseLogic.x > width * 2/3) MouseLogic.mouseOOB();
+        if (MouseLogic.x > width * 2 / 3){
+            MouseLogic.mouseOOB();
+            return;
+        } 
 
         MouseLogic.movingNode = null;
 
@@ -190,7 +231,7 @@ const MouseLogic = {
         labelColliders.shift();
         let collision = getCollision(labelColliders);
         if (collision != null) {
-            nodes.push(TNode(MouseLogic.x, MouseLogic.y, collision.color));
+            nodes.push(TNode(MouseLogic.x, MouseLogic.y, collision.label));
             generateNodeColliders();
         }
         labelColliders = [];
@@ -198,12 +239,12 @@ const MouseLogic = {
         MouseLogic.lastClickY = -1;
     },
     mouseMove: (e) => {
-        
+
         var rect = canvas.getBoundingClientRect();
         MouseLogic.x = e.clientX - rect.left;
         MouseLogic.y = e.clientY - rect.top;
 
-        if (MouseLogic.x >= width * 2/3) MouseLogic.mouseOOB();
+        if (MouseLogic.x >= width * 2 / 3) MouseLogic.mouseOOB();
 
         if (MouseLogic.movingNode != null) {
             MouseLogic.movingNode.x = MouseLogic.x;

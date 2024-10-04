@@ -11,13 +11,75 @@
             <img src="https://i.kym-cdn.com/entries/icons/original/000/000/142/feelsgoodman.png" width="40" height="20">
         </a>
     </div>
-    <h2>Grow a Forest with Trees</h2>
+    <h2>🌳</h2>
     <canvas width="720" height="480" class="img" onmousedown="MouseLogic.mouseDown(event)" onmouseup="MouseLogic.mouseUp(event)" onmousemove="MouseLogic.mouseMove(event)" onmouseleave="MouseLogic.mouseOOB()">:(</canvas>
+    <button class="img">SUBMIT</button>
     <div>
         <h3>TREE(n=
             <input type="number" min="1" max="3" value="1" id="TREE_n" onchange="TREE_n = +this.value">
         ), ∀ n ∈ {1, 2, 3}
         </h3>
+    </div>
+    <div>
+        <h4>
+            Du får en godis om du kan hitta alla lösningar 🍭<br>
+            <br>
+            Mål:
+            <ul>
+                Du ska odla en skog och fördröja dess (oundvikliga) död så länge du kan.
+                <br>
+                Detta gör du genom att plantera ett frö (trädets rot) som sedan växer ut grenar till nya frön, som i sin tur växer ut grenar till nya frön osv.
+            </ul>
+            Regler:
+            <ul>
+                <li>Dessa träd är matematiska träd och får därför inte innehålla slutna slingor (loops).<br>
+                    Det finns alltså bara EN unik väg till alla frön.
+                </li>
+                <br>
+                <li>För min mentala hälsa måste alla grenar växa (peka) <i>BORT</i> från trädets rot. <br>
+                    Att kontrollera äktheten är redan svårt nog, gör det inte svårare för mig🥺.
+                </li>
+                <br>
+                <li>Argumentet n avgör hur många <i>olika</i> frön (färger) du har att jobba med.<br> 
+                    TREE(1) har bara <span style="color: green;">gröna</span> frön. <br> 
+                    TREE(2) har <span style="color: green;">gröna</span> och <span style="color: red;">röda</span> <br>
+                    TREE(3) har <span style="color: green;">gröna</span>, <span style="color: red;">röda</span> och <span style="color: blue;">blå</span>
+                </li>
+                <br>
+                <li>För ett givet n så får trädet max innehålla lika många frön som dess ordning i serien.<br>
+                    Alltså får det första trädet i TREE(n) max innehålla 1 frö (nod). <br>
+                    Det andra trädet i serien får max bestå av 2 st frön sammankopplade men kan även bestå av bara 1 frö. <br>
+                    Det tredje består av max 3 st osv. <br>
+                    Du får alltså inte börja med ett stort träd utan måste välja en enda nod. 
+                </li>
+                <br>
+                <li>Om ett träd 'innehåller' ett tidigare träd (för samma n) kommer hela skogen att dö. 🔥<br>
+                    <ul>Det luddiga begreppet 'innehåller' innebär här att ett par frön från underträdet delar samma närmaste-gemensamma-förfader (dvs. inf-embeddable 🤓)</ul>
+                </li>
+                <br>
+                Hajaru? Kolla på en <a href="https://youtu.be/3P6DWAwwViU?si=nlNSqj4VWq1e-XU-&t=15">youtube</a>-video annars och kom tillbaka sen. <br>
+                Alternativt om du föredrar mer formella regler så har <a href="https://en.wikipedia.org/wiki/Kruskal%27s_tree_theorem">Kruskal & Friedman</a> en bättre förklaring.
+            </ul>
+            Interaktion:
+            <ul>
+                <li>Plantera frö: <br>
+                    Vänsterklick och håll ner för meny, håll musen över fröet du vill plantera och släpp upp musknappen.
+                </li>
+                <br>
+                <li>Odla grenar mellan fröna: <br>
+                    Vänsterklicka på ett frö och dra till fröet du vill odla en gren till, släpp musknappen för att odla grenen.
+                </li>
+                <br>
+                <li>Flytta frön: <br>
+                    Högerklicka och dra för att flytta.
+                </li>
+                <br>
+                <li>Spara träd: <br>
+                    När du är klar med ett träd trycker du <b style="background-color: whitesmoke;">SUBMIT</b> för att spara trädet.
+
+                </li>
+            </ul> 
+        </h4>
     </div>
     <script src="tree3.js"></script>
 </body>
