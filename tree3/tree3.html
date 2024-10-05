@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COLOR</title>
+    <title>TREE(3)</title>
     <link rel="stylesheet" href="../style.css">
 </head>
 <body>
@@ -11,11 +11,13 @@
             <img src="https://i.kym-cdn.com/entries/icons/original/000/000/142/feelsgoodman.png" width="40" height="20">
         </a>
     </div>
-    <h2>🌳</h2>
+    <h2>🌳3</h2>
     <canvas width="720" height="480" class="img" onmousedown="MouseLogic.mouseDown(event)" onmouseup="MouseLogic.mouseUp(event)" onmousemove="MouseLogic.mouseMove(event)" onmouseleave="MouseLogic.mouseOOB()">:(</canvas>
-    <div>
-        <button class="img">SUBMIT</button>
-        <button class="img" onclick="reset()">CLEAR</button>
+    <input  class="img" id="message" type="text" readonly="true" size="97" spellcheck="false" style="text-align: center;">
+    <div style=" display: flex; justify-content: center; align-items: center;">
+        <button onclick="submitTree()">SUBMIT</button>
+        <button onclick="clearTree()">CLEAR</button>
+        <button onclick="resetTrees()">RESET</button>
     </div>
     <div>
         <h2>TREE(n=
@@ -31,13 +33,13 @@
             <ul>
                 Du ska odla en skog och fördröja dess (oundvikliga) död så länge du kan.
                 <br>
-                Detta gör du genom att plantera ett frö (trädets rot) som sedan växer ut grenar till nya frön, som i sin tur växer ut grenar till nya frön osv.
+                Detta gör du genom att plantera ett frö (det första fröet blir trädets rot) som sedan växer ut grenar till nya frön, som i sin tur växer ut grenar till nya frön osv.
             </ul>
-            Regler:
+            Regler från definitioner:
             <ul>
                 Träden vi jobbar med är <i>acykliska, oriktade, märkta och rotade grafer</i>. 🤓 <br>
                 Så vad betyder det egentligen..? <br>
-                <li>Dessa träd är matematiska träd och får därför inte innehålla slutna slingor/loops (acyklisk).<br>
+                <li>Dessa träd är matematiska träd och får därför inte innehålla slutna slingor/loops. (acyklisk)<br>
                     Det finns alltså bara EN unik väg till alla frön.
                 </li>
                 <br>
@@ -45,7 +47,7 @@
                     Alltså är ordningen irrelevant när grenarna bildas.
                 </li>
                 <br>
-                <li>Argumentet n avgör hur många <i>olika</i> frön (färger) du har att jobba med. (märkta)<br> 
+                <li>Argumentet n avgör hur många <i>olika typer</i> av frön (färger) du har att jobba med. (märkta)<br> 
                     TREE(1) har bara <span style="color: green;">gröna</span> frön. <br> 
                     TREE(2) har <span style="color: green;">gröna</span> och <span style="color: red;">röda</span> <br>
                     TREE(3) har <span style="color: green;">gröna</span>, <span style="color: red;">röda</span> och <span style="color: blue;">blå</span>
@@ -55,6 +57,9 @@
                     Detta frö får en outline som markering.
                 </li>
                 <br>
+            </ul>
+            Regler specifika för TREE(n):
+            <ul>
                 <li>För ett givet n så får trädet max innehålla lika många frön som dess ordning i serien.<br>
                     Alltså får det första trädet i TREE(n) max innehålla 1 frö (nod).<br>
                     Det andra trädet i serien får max bestå av 2 st frön sammankopplade men kan även bestå av bara 1 frö. <br>
@@ -63,16 +68,39 @@
                 </li>
                 <br>
                 <li>Om ett träd 'innehåller' ett tidigare träd (för samma n) kommer hela skogen att dö. 🔥<br>
-                    <ul>Det luddiga begreppet 'innehåller' innebär här att ett par frön från underträdet delar samma närmaste-gemensamma-förfader (dvs. inf-embeddable 🤓)</ul>
+                    Det luddiga begreppet 'innehåller' kan man se ungefär som att vi kan återskapa subträdet genom att plocka bort frön det större trädet.<br>
+                    I subträdet kommer två löv (frön med bara en gren) alltid att ha en unik väg till varandra, där dom möts (gemensamma förfadern) måste finnas i det större trädet.<br>
+                    Mer exakt innebär det: varje frö i subträdet T1 kan återfinnas i det större trädet T2 (med samma färg såklart). <br>
+                    Om ett frö F1 i T1 direkt följs av ett annat frö F2 måste F1:s motsvarande frö i T2 följas av det andra fröet F2 <i>MEN</i> fröna i T2 får ha andra frön mellan sig. <br>
+
+                    Om trädet T2 'innehåller' subträdet T1 kallar vi T1 "inf-embeddable" i T2. 🤓
                 </li>
+                Det är inte så lätt att förklara i text så här är några exempel:
+                <img src="./inf_embeddable.png" style="display: block; margin-left: 0%; margin-right: auto;">
                 <br>
+                <li>Ex. 1:<br>
+                    Om vi plockar bort det övre <span style="color: green;">gröna</span> fröet från T2 får vi T1.<br>
+                    Vi ser också att vägen från det <span style="color: blue;">blåa</span> till det <span style="color: red;">röda</span> lövet innehåller det centrala <span style="color: green;">gröna</span> fröet. <br>
+                    T2 innehåller T1 <br> 
+                </li>
+                <li>Ex. 2:<br>
+                    På samma sätt som innan plockar vi bort de 2 undre <span style="color: blue;">blåa</span> fröna från T4 och får då T3.<br>
+                    Vi ser också att vägen från det <span style="color: red;">röda</span> till det <span style="color: green;">gröna</span> lövet innehåller det översta <span style="color: blue;">blåa</span> fröet. <br>
+                    T4 innehåller T3 <br> 
+                </li>
+                <li>Ex. 3:<br>
+                    Här kan vi börja med att plocka bort det centrala blåa fröet från T6 får vi T5.<br>
+                    MEN vägen från det <span style="color: green;">gröna</span> till det <span style="color: red;">röda</span> lövet innehåller INTE det <span style="color: blue;">blåa</span> fröet. <br>
+                    T6 innehåller INTE T5 <br> 
+                </li>
                 Hajaru? Kolla på en <a href="https://youtu.be/3P6DWAwwViU?si=nlNSqj4VWq1e-XU-&t=15">youtube</a>-video annars och kom tillbaka sen. <br>
                 Alternativt om du föredrar mer formella regler så har <a href="https://en.wikipedia.org/wiki/Kruskal%27s_tree_theorem">Kruskal & Friedman</a> en bättre förklaring.
             </ul>
             Interaktion:
             <ul>
                 <li>Plantera frö: <br>
-                    Vänsterklick och håll ner för meny, håll musen över fröet du vill plantera och släpp upp musknappen.
+                    Vänsterklick och håll ner för meny, håll musen över fröet du vill plantera och släpp upp musknappen.<br>
+                    Det första fröet blir trädets rot.
                 </li>
                 <br>
                 <li>Odla grenar mellan fröna: <br>
@@ -84,10 +112,21 @@
                 </li>
                 <br>
                 <li>Spara träd: <br>
-                    När du är klar med ett träd trycker du <b style="background-color: whitesmoke;">SUBMIT</b> för att spara trädet.
-
+                    När du är klar med ett träd trycker du <b style="background-color: whitesmoke;">SUBMIT</b> för att spara trädet.<br>
+                    Då kollar jag om du har följt alla regler, annars får du veta vad du gjorde fel.
                 </li>
-            </ul> 
+                <br>
+                <li>Börja om med nuvarande träd: <br>
+                    Jag har inte lagt till förmågan att ta bort frön så om du har gjort fel trycker du <b style="background-color: whitesmoke;">CLEAR</b> så rensas det nuvarande trädet.<br>
+                    Då får du göra om och göra rätt.
+                </li>
+                <br>
+                <li>Rensa alla träd och börja om från början: <br>
+                    Om du känner att du har formulerat träden i fel ordning kan du börja om från början med <b style="background-color: whitesmoke;">RESET</b> <br>
+                    (ordningen spear ju roll då ett träd inte får innehålla ett tidigare träd)
+                </li>
+            </ul>
+            Förlåt för mängden text men reglerna är inte självklara, och jag har läst bra mycket mer för att lista ut en implementering...
         </h3>
     </div>
     <script src="tree3.js"></script>

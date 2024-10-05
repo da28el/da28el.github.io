@@ -3,6 +3,7 @@ let ctx = canvas.getContext('2d');
 let width = canvas.width; // = window.innerWidth;
 let height = canvas.height; // = window.innerHeight;
 canvas.oncontextmenu = function (e) { e.preventDefault(); e.stopPropagation(); }
+const message = document.getElementById("message");
 
 // CONFIG
 const nodeSize = 24;
@@ -24,7 +25,7 @@ let nodes = [];
 let edges = [];
 let nodeColliders = [];
 let labelColliders = [];
-let trees = [];
+let trees = [[], [], []];
 
 const TNode = (x, y, label) => {
     return {
@@ -36,33 +37,38 @@ const TNode = (x, y, label) => {
     }
 }
 
+
 function inf_embedded(v, fv) {
     const match = (v, fv) => ((v.label == fv.label) && (!fv.checked));
     // Naive case
-    if (v == null) return true // empty is embeddable in n2
-    if (fv == null) return false // n1 not embeddable in empty
+    // if (v == null) return true
+    // if (fv == null) return false
 
     if (match(v, fv)) {
-        fv.matched = true; // mark vertex used
-        let matchedAll = true;
+        fv.matched = true;
+        let matchedChildrenV = [].fill(false, 0, v.children.length);
+        let availableChildrenFv = [];
+        for (let i = 0; i < fv.children.length; i++)
+            if(!fv.children[i].matched) availableChildrenFv.push(fv.children[i]);
+
         for (let i = 0; i < v.children.length; i++) {
             let matchFound = false;
-            for (let j = 0; j < fv.children.length; j++) {
-                if (inf_embedded(v.children[i], fv.children[j])) {
+            for (let j = 0; j < availableChildrenFv.length; j++) {
+                if (inf_embedded(v.children[i], availableChildrenFv[j])) {
                     matchFound = true;
+                    availableChildrenFv.splice(j, 1);
                     break;
                 }
             }
             if (!matchFound) {
-                matchedAll = false;
-                break;
+                return false;
             }
         }
-        return matchedAll;
+        return true;
     }
 
     for (let j = 0; j < fv.children.length; j++) {
-        if  (inf_embedded(v, fv.children[j])){
+        if (inf_embedded(v, fv.children[j])) {
             return true;
         }
     }
@@ -70,8 +76,139 @@ function inf_embedded(v, fv) {
     return false;
 }
 
-function submitTree(rootNode) {
 
+function unmatch(root) {
+    root.matched = false;
+    for (let i = 0; i < root.children; i++)
+        unmatch(root.children[i]);
+}
+
+function isCyclic(root) {
+    unmatch(root);
+    let cycle = false;
+    const dfs = (n) => {
+        if (n.matched) {
+            cycle = true;
+            return;
+        }
+        n.matched = true;
+        for(let i = 0; i < n.children.length; i++)
+            dfs(n.children[i]);
+    }
+    dfs(root);
+    unmatch(root);
+    return cycle;
+}
+
+function isDisjointed(root) {
+    unmatch(root);
+    const dfs = (n) => {
+        n.matched = true;
+        for(let i = 0; i < n.children.length; i++)
+            dfs(n.children[i]);
+    }
+    dfs(root);
+    for (let i = 0; i < nodes.length; i++) {
+        if (!nodes[i].matched) return true;
+    }
+    unmatch(root);
+    return false;
+}
+
+function validateTree(root) {
+    let maxVertices = trees[TREE_n - 1].length;
+    if (nodes.length > maxVertices + 1) {
+        message.value = "Trädet får max ha " + (maxVertices + 1) + "st frön! Läs reglerna igen";
+        return false;
+    }
+
+    if (isCyclic(root)) {
+        message.value = "Trädet få inte vara cykliskt! Läs reglerna igen";
+        return false;
+    }
+
+    if (isDisjointed(root)) {
+        message.value = "Du får bara göra ett träd åt gången, kom ihåg att koppla ihop alla frön";
+        return false;
+    }
+
+    for (let i = 0; i < maxVertices; i++) {
+        let T1 = trees[TREE_n - 1][i];
+        unmatch(T1);
+        if (inf_embedded(T1, root)) {
+            message.value = "Trädet innehåller träd #" + (i + 1) + "! Gör om och gör rätt";
+            return false;
+        }
+    }
+
+    return true;
+
+}
+
+function resizeAndMoveTree(root) {
+    // average position
+    let avgX = 0;
+    let avgY = 0;
+    const avgP = (e) => {
+        avgX += e.x;
+        avgY += e.y;
+        for (let i = 0; i < e.children.length; i++)
+            avgP(e.children[i])
+    }
+    avgP(root);
+    avgX /= nodes.length;
+    avgY /= nodes.length;
+    // offset and scale
+    const offsetScale = (e) => {
+        e.x -= avgX;
+        e.x /= 6;
+        e.y -= avgY;
+        e.y /= 6;
+        if (TREE_n == 1) {
+            e.x += width * 2.5 / 3;
+            e.y += height / 6;
+        } else if (TREE_n == 2) {
+            e.x += width * 2 / 3 + (trees[TREE_n - 1].length + 0.5) * width / 9;
+            e.y += height / 2;
+        } else {
+            e.x += width * 2 / 3 + (trees[TREE_n - 1].length % 6 + 0.25) * width / 18;
+            e.y += height * 1.45 / 2 + Math.floor(trees[TREE_n - 1].length / 6) * 50;
+        }
+        for (let i = 0; i < e.children.length; i++)
+            offsetScale(e.children[i]);
+    }
+    offsetScale(root);
+
+}
+
+function submitTree() {
+    if (nodes.length == 0) return;
+    let root = parentTree(nodes[0]);
+    if (validateTree(root)) {
+        message.value = "";
+        resizeAndMoveTree(root);
+        trees[TREE_n - 1].push(root);
+    }
+    clearTree();
+}
+
+function parentTree(root) {
+    for (let i = 0; i < edges.length; i++) {
+        let edge = edges[i];
+        if (edge[2] || edge[0] == edge[1]) continue;
+        if (edge[0] == root) {
+            root.children.push(edge[1]);
+            edge[2] = true;
+        } else if (edge[1] == root) {
+            root.children.push(edge[0]);
+            edge[2] = true;
+        }
+    }
+    for (let j = 0; j < root.children.length; j++) {
+        let child = root.children[j];
+        parentTree(child);
+    }
+    return root;
 }
 
 const Collider = (x, y, r, label, parent = null) => {
@@ -148,6 +285,40 @@ function drawNodes() {
     });
 }
 
+function drawTrees() {
+    const drawLine = (x1, y1, x2, y2) => {
+        ctx.strokeStyle = "#000000";
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+    };
+    const drawTree = (root, isFirst = false) => {
+        if (isFirst) {
+            ctx.fillStyle = "#000000";
+            ctx.beginPath();
+            ctx.arc(root.x, root.y, 7, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+        ctx.fillStyle = LABEL_COLOR[root.label];
+        ctx.beginPath();
+        ctx.arc(root.x, root.y, 5, 0, 2 * Math.PI);
+        ctx.fill();
+        for (let c = 0; c < root.children.length; c++) {
+            let child = root.children[c];
+            drawLine(root.x, root.y, child.x, child.y);
+            drawTree(child);
+        }
+
+    }
+    for (let n = 0; n < 3; n++) {
+        for (let i = 0; i < trees[n].length; i++) {
+            let tree = trees[n][i];
+            drawTree(tree, true);
+        }
+    }
+}
+
 function drawLines() {
     const line = (x1, y1, x2, y2) => {
         ctx.strokeStyle = "#000000";
@@ -196,6 +367,8 @@ const MouseLogic = {
             let collision = getCollision(nodeColliders);
             if (collision != null) {
                 MouseLogic.movingNode = collision.parent;
+            } else {
+                MouseLogic.mouseOOB();
             }
             return;
         }
@@ -224,8 +397,8 @@ const MouseLogic = {
 
         if (MouseLogic.connectingFrom != null) {
             let collision = getCollision(nodeColliders);
-            if (collision != null) {
-                edges.push([MouseLogic.connectingFrom.parent, collision.parent]);
+            if (collision != null && collision != MouseLogic.connectingFrom) {
+                edges.push([MouseLogic.connectingFrom.parent, collision.parent, false]);
             }
             MouseLogic.connectingFrom = null;
         }
@@ -273,7 +446,7 @@ const MouseLogic = {
     }
 };
 
-function reset() {
+function clearTree() {
     MouseLogic.mouseOOB();
     nodes = [];
     edges = [];
@@ -281,12 +454,17 @@ function reset() {
     labelColliders = [];
 }
 
+function resetTrees() {
+    trees = [[],[],[]];
+    clearTree();
+}
+
 function loop() {
     drawBackground();
     drawLines();
     drawNodes();
     drawLabelSelection();
-
+    drawTrees();
     requestAnimationFrame(loop);
 }
 
