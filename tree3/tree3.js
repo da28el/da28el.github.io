@@ -5,11 +5,11 @@ let height = canvas.height; // = window.innerHeight;
 canvas.oncontextmenu = function (e) { e.preventDefault(); e.stopPropagation(); }
 
 // CONFIG
-const nodeSize = 8;
-const labelSelectorSize = 15;
-const labelSelectorOffsetX = 20;
-const labelSelectorOffsetY = 30;
-const labelSelectorBreakRange = 50;
+const nodeSize = 24;
+const labelSelectorSize = 25;
+const labelSelectorOffsetX = 25;
+const labelSelectorOffsetY = 35;
+const labelSelectorBreakRange = 75;
 
 const LABEL_COLOR = {
     0: "rgba(0,0,0,0.1)",
@@ -21,32 +21,53 @@ const LABEL_COLOR = {
 // Globals
 let TREE_n = 1;
 let nodes = [];
+let edges = [];
 let nodeColliders = [];
 let labelColliders = [];
 let trees = [];
 
-const TNode = (x, y, label, children = []) => {
+const TNode = (x, y, label) => {
     return {
         x: x,
         y: y,
         label: label,
-        children: children
+        children: [],
+        matched: false
     }
 }
 
-function countNodes(root) {
-    let nodes = []
-    const dfs = (n) => {
-        if (n == 0) return
-        nodes.push(n)
-        n.children.forEach(c => dfs(c)) 
+function inf_embedded(v, fv) {
+    const match = (v, fv) => ((v.label == fv.label) && (!fv.checked));
+    // Naive case
+    if (v == null) return true // empty is embeddable in n2
+    if (fv == null) return false // n1 not embeddable in empty
+
+    if (match(v, fv)) {
+        fv.matched = true; // mark vertex used
+        let matchedAll = true;
+        for (let i = 0; i < v.children.length; i++) {
+            let matchFound = false;
+            for (let j = 0; j < fv.children.length; j++) {
+                if (inf_embedded(v.children[i], fv.children[j])) {
+                    matchFound = true;
+                    break;
+                }
+            }
+            if (!matchFound) {
+                matchedAll = false;
+                break;
+            }
+        }
+        return matchedAll;
     }
-    dfs(root)
-    return nodes.length
-}
 
-function inf_embedded(rootNode1, rootNode2) {
+    for (let j = 0; j < fv.children.length; j++) {
+        if  (inf_embedded(v, fv.children[j])){
+            return true;
+        }
+    }
 
+    return false;
 }
 
 function submitTree(rootNode) {
@@ -55,16 +76,6 @@ function submitTree(rootNode) {
 
 const Collider = (x, y, r, label, parent = null) => {
     return { x, y, r, label, parent }
-}
-
-function addChild(parent, child) {
-    for (let i = 0; i < parent.children.length; i++) {
-        if (parent.children[i] == child) return;
-    }
-    for (let j = 0; j < child.children.length; j++) {
-        if (child.children[j] == parent) return
-    }
-    parent.children.push(child);
 }
 
 function generateNodeColliders() {
@@ -89,14 +100,17 @@ function getCollision(colliders) {
 }
 
 function drawCollider(collider, label) {
-    ctx.fillStyle = LABEL_COLOR[label];
-    ctx.beginPath();
-    ctx.arc(collider.x, collider.y, collider.r, 0, 2 * Math.PI);
-    ctx.fill();
     if (collider == nodeColliders[0]) {
         ctx.fillStyle = "#000000";
-        ctx.fillText("ROOT", collider.x-15, collider.y-10)
+        ctx.beginPath();
+        ctx.arc(collider.x, collider.y, collider.r - 5, 0, 2 * Math.PI);
+        ctx.fill();
+        //ctx.fillText("ROOT", collider.x-15, collider.y-10)
     }
+    ctx.fillStyle = LABEL_COLOR[label];
+    ctx.beginPath();
+    ctx.arc(collider.x, collider.y, collider.r - 8, 0, 2 * Math.PI);
+    ctx.fill();
 }
 
 function generateLabelColliders() {
@@ -135,36 +149,24 @@ function drawNodes() {
 }
 
 function drawLines() {
-    const arrow = (x1, y1, x2, y2) => {
-        const theta = 2.5*Math.PI/3
+    const line = (x1, y1, x2, y2) => {
         ctx.strokeStyle = "#000000";
         ctx.beginPath();
         ctx.moveTo(x1, y1);
         ctx.lineTo(x2, y2);
-        let dx = x2 - x1;
-        let dy = y2 - y1;
-        let r = Math.sqrt(dx*dx+dy*dy);
-        dx = 20*dx/r;
-        dy = 20*dy/r;
-        ctx.moveTo(x2, y2);
-        ctx.lineTo(x2 + dx * Math.cos(theta) - dy * Math.sin(theta), y2 + dx * Math.sin(theta) + dy * Math.cos(theta))
-        ctx.moveTo(x2, y2);
-        ctx.lineTo(x2 + dx * Math.cos(-theta) - dy * Math.sin(-theta), y2 + dx * Math.sin(-theta) + dy * Math.cos(-theta))
         ctx.stroke();
     };
 
     if (MouseLogic.connectingFrom != null) {
-        arrow(MouseLogic.connectingFrom.x, MouseLogic.connectingFrom.y, MouseLogic.x, MouseLogic.y);
+        line(MouseLogic.connectingFrom.x, MouseLogic.connectingFrom.y, MouseLogic.x, MouseLogic.y);
     }
-    nodes.forEach(element => {
-        element.children.forEach(child => {
-            arrow(element.x, element.y, child.x, child.y);
-        });
+    edges.forEach(element => {
+        line(element[0].x, element[0].y, element[1].x, element[1].y);
     });
 }
 
 function drawBackground() {
-    ctx.fillStyle = "rgb(240,240,210";
+    ctx.fillStyle = "rgb(240,240,210)";
     ctx.fillRect(0, 0, width, height);
     ctx.fillStyle = "rgba(0,255,0,0.5)";
     ctx.fillRect(width * 2 / 3, 0, width, height / 3);
@@ -213,17 +215,17 @@ const MouseLogic = {
 
     },
     mouseUp: (e) => {
-        if (MouseLogic.x > width * 2 / 3){
+        if (MouseLogic.x > width * 2 / 3) {
             MouseLogic.mouseOOB();
             return;
-        } 
+        }
 
         MouseLogic.movingNode = null;
 
         if (MouseLogic.connectingFrom != null) {
             let collision = getCollision(nodeColliders);
             if (collision != null) {
-                addChild(MouseLogic.connectingFrom.parent, collision.parent);
+                edges.push([MouseLogic.connectingFrom.parent, collision.parent]);
             }
             MouseLogic.connectingFrom = null;
         }
@@ -270,6 +272,14 @@ const MouseLogic = {
         labelColliders = [];
     }
 };
+
+function reset() {
+    MouseLogic.mouseOOB();
+    nodes = [];
+    edges = [];
+    nodeColliders = [];
+    labelColliders = [];
+}
 
 function loop() {
     drawBackground();
