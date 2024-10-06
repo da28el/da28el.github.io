@@ -37,12 +37,20 @@ const TNode = (x, y, label) => {
     }
 }
 
+function logNode(node, tab = 0) {
+    let msg = "[" + node.label + "]";
+    for (let i = 0; i < tab; i++) msg += "\t";
+    console.log(msg, tab)
+    for (let j = 0; j < node.children.length; j++)
+        logNode(node.children[j], tab+1);
+}
+
 
 function inf_embedded(v, fv) {
-    const match = (v, fv) => ((v.label == fv.label) && (!fv.checked));
+    const match = (v, fv) => ((v.label == fv.label) && (!fv.matched));
     // Naive case
-    // if (v == null) return true
-    // if (fv == null) return false
+    if (v == null) return true
+    if (fv == null) return false
 
     if (match(v, fv)) {
         fv.matched = true;
@@ -61,6 +69,7 @@ function inf_embedded(v, fv) {
                 }
             }
             if (!matchFound) {
+                fv.matched = false;
                 return false;
             }
         }
@@ -76,10 +85,13 @@ function inf_embedded(v, fv) {
     return false;
 }
 
+let T1_root = TNode(0,0,1);
+let T2_root = TNode(0,0,2);
+T2_root.children = [TNode(0,0,1)];
 
 function unmatch(root) {
     root.matched = false;
-    for (let i = 0; i < root.children; i++)
+    for (let i = 0; i < root.children.length; i++)
         unmatch(root.children[i]);
 }
 
@@ -135,6 +147,7 @@ function validateTree(root) {
     for (let i = 0; i < maxVertices; i++) {
         let T1 = trees[TREE_n - 1][i];
         unmatch(T1);
+        unmatch(root);
         if (inf_embedded(T1, root)) {
             message.value = "Trädet innehåller träd #" + (i + 1) + "! Gör om och gör rätt";
             return false;
