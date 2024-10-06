@@ -1,1 +1,84 @@
 https://www.youtube.com/watch?v=nZHjD3cI-EU&ab_channel=Deadlock
+https://stackoverflow.com/questions/41946007/efficient-and-well-explained-implementation-of-a-quadtree-for-2d-collision-det
+
+
+
+
+class QuadTree {
+    constructor(Q2 = new Vec2(), Q4 = new Vec2(width, height)) {
+        this.Q2 = Q2;
+        this.Q4 = Q4;
+        this.n = null;
+        this.q1 = null;
+        this.q2 = null;
+        this.q3 = null;
+        this.q4 = null;
+    }
+
+    insert(particle) {
+        if (particle == null || !this.inBoundry(particle.p)) return;
+        if (Math.abs(this.Q2.x - this.Q4.x) <= 1 &&
+            Math.abs(this.Q2.y - this.Q4.y) <= 1) {
+            if (this.n == null) this.n = particle;
+            return;
+        }
+        if ((this.Q2.x + this.Q4.x) / 2 >= particle.p.x) {
+            if ((this.Q2.y + this.Q4.y) / 2 >= particle.p.y) {
+                if (this.q2 == null) {
+                    this.q2 = new QuadTree(this.Q2, new Vec2((this.Q2.x + this.Q4.x) / 2,
+                                                             (this.Q2.y + this.Q4.y) / 2));
+                }
+                this.q2.insert(particle);
+            } else {
+                if (this.q3 == null) {
+                    this.q3 = new QuadTree(new Vec2( this.Q2.x, (this.Q2.y + this.Q4.y) / 2), 
+                                           new Vec2((this.Q2.x + this.Q4.x) / 2, this.Q4.y));
+                }
+                this.q3.insert(particle);
+            }
+        } else {
+            if ((this.Q2.y + this.Q4.y) / 2 >= particle.p.y) {
+                if (this.q1 == null) {
+                    this.q1 = new QuadTree(new Vec2((this.Q2.x + this.Q4.x) / 2, this.Q2.y), 
+                                           new Vec2(this.Q4.x, (this.Q2.y + this.Q4.y) / 2));
+                }
+                this.q1.insert(particle);
+            } else {
+                if (this.q4 == null) {
+                    this.q4 = new QuadTree(new Vec2((this.Q2.x + this.Q4.x) / 2, 
+                                                    (this.Q2.y + this.Q4.y) / 2), this.Q4);
+                }
+                this.q4.insert(particle);
+            }
+        }
+    }
+
+    search(particle) {
+        if (!this.inBoundry(particle)) return 0;
+        if (this.n != null) return this.n;
+        
+        if ((this.Q2.x + this.Q4,x) / 2 >= particle.p.x) {
+            if ((this.Q2.y + this.Q4.y) / 2 >= particle.p.y) {
+                if (this.q2 == null) return 0;
+                return this.q2.search(particle);
+            } else {
+                if (this.q3 == null) return 0;
+                return this.q3.search(particle);
+            }
+        } else {
+            if ((this.Q2.y + this.Q4.y) / 2 >= particle.p.y) {
+                if (this.q1 == null) return 0;
+                return this.q1.search(particle);
+            } else {
+                if (this.q4 == null) return 0;
+                return this.q4.search(particle);
+            }
+        }
+    }
+
+    inBoundry(p) {
+        return p.x >= this.Q2.x && p.x <= this.Q4.x &&
+            p.y >= this.Q2.y && p.y <= this.Q4.y;
+    }
+
+}

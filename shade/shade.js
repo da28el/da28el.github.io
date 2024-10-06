@@ -53,7 +53,9 @@ function main() {
     // }
     // `;    
 
-    const fsSource = "precision highp float;\n" + document.getElementById("shader").value;
+    // const fsSource = "precision highp float;\n" + document.getElementById("shader").value;
+
+    const fsSource = "precision highp float;\n" + editor.getValue();
 
     console.log(fsSource);
 
@@ -182,15 +184,16 @@ function setPositionAttribute(gl, programInfo, buffer) {
 
 
 
-document.getElementById('shader').addEventListener('keydown', function(e) {
-    if (e.key == 'Tab') {
-      e.preventDefault();
-      var start = this.selectionStart;
-      var end = this.selectionEnd;
+// document.getElementById('shader').addEventListener('keydown', function(e) {
+document.getElementById('editor').addEventListener('keydown', function(e) {
+    // if (e.key == 'Tab') {
+    //   e.preventDefault();
+    //   var start = this.selectionStart;
+    //   var end = this.selectionEnd;
   
-      this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
-      this.selectionStart = this.selectionEnd = start + 4;
-    }
+    //   this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
+    //   this.selectionStart = this.selectionEnd = start + 4;
+    // }
     if (e.key == 'Enter' && e.ctrlKey) {
         main();
     }

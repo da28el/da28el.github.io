@@ -4,6 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebGL2</title>
     <link rel="stylesheet" href="../style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.36.2/ace.js" integrity="sha512-yjhIcftV1KZyd3rLPujicRV6NpFEuCqQaOBBdrey6vFdU1zVkJYgJf9a+15YrOuzzSXYNV2GU4xdQ8Xy9Zj/fA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         table, th, td {
             border: 2px solid black;
@@ -11,6 +12,13 @@
         }
         textarea {
             resize: none;
+        }
+        #editor {
+            position: absolute;
+            top: 99px;
+            right: 285px;
+            bottom: 134px;
+            left: 1007px;
         }
     </style>
 </head>
@@ -21,9 +29,24 @@
         </a>
     </div>
     <h2>Shaders</h2>
-    <div style="display: flex; justify-content: center;">
+    <div id="editor">//Fragment shader
+varying highp vec2 vPos;
+varying float fTime;
+        
+void main() {
+    vec3 color = (vec3(vPos, 0.0)+1.0)/2.0;
+    float dist = length(vPos);
+    if(dist < 0.25*sin(fTime)+0.5)
+        color = vec3(1.0)-vec3(vPos, 0.0);
+            
+    if (dist > 0.75*cos(fTime)+0.5)
+        color = color + 1.0;
+            
+    gl_FragColor = vec4(color, 1.0);
+}</div>
+    <div style="display: flex; justify-content: center; padding-right: 32%;">
         <canvas id="canvas" width="720" height="720">:(</canvas>
-<textarea id="shader" cols="80" spellcheck="false">
+<!-- <textarea id="shader" cols="80" spellcheck="false">
 varying highp vec2 vPos;
 varying float fTime;
 
@@ -38,7 +61,7 @@ void main() {
     
     gl_FragColor = vec4(color, 1.0);
 }
-</textarea>
+</textarea> -->
     </div>
     <br>
     <button onclick="main()" class="img" style="width: 10%; height: 40px;">Render (ctrl-enter)</button>
@@ -159,5 +182,10 @@ void main() {
             </td>
         </tr>
     </table>
+    <script>
+        var editor = ace.edit("editor");
+        editor.setTheme("ace/theme/monokai");
+        editor.session.setMode("ace/mode/glsl");    
+    </script>
     <script src="shade.js"></script>
 </body>
