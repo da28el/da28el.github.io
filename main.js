@@ -110,23 +110,23 @@ window.scrollTo({top:0, behavior:'smooth'})
 animate();
 
 // Preload images for smooth transition
-let preloadedImages = [];
-function preloadImagesFromPage(url) {
-    fetch(url)
-        .then(response => response.text())
-        .then(html => {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = html;
+// let preloadedImages = [];
+// function preloadImagesFromPage(url) {
+//     fetch(url)
+//         .then(response => response.text())
+//         .then(html => {
+//             const tempDiv = document.createElement('div');
+//             tempDiv.innerHTML = html;
 
-            const images = tempDiv.querySelectorAll('img');
-            images.forEach(img => {
-                const newImg = new Image();
-                newImg.src = img.src;
-                preloadedImages.push(newImg);
-            });
+//             const images = tempDiv.querySelectorAll('img');
+//             images.forEach(img => {
+//                 const newImg = new Image();
+//                 newImg.src = img.src;
+//                 preloadedImages.push(newImg);
+//             });
 
-            // console.log("Images preloaded:", preloadedImages);
-        })
-        .catch(error => console.error('Failed to preload images:', error));
-}
-preloadImagesFromPage('homepage.html');
+//             // console.log("Images preloaded:", preloadedImages);
+//         })
+//         .catch(error => console.error('Failed to preload images:', error));
+// }
+// preloadImagesFromPage('homepage.html');
