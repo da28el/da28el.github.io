@@ -11,7 +11,7 @@ const CANVAS_MAX_SIZE = 480;
 const sin = Math.sin;
 const cos = Math.cos;
 const PI = pi = Math.PI;
-const e = Math.e;
+const e = Math.E;
 const exp = Math.exp;
 
 // globals

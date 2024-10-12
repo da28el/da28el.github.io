@@ -77,7 +77,8 @@ animationScripts.push(animationScript(90, 101, ()=>{
 }));
 
 animationScripts.push(animationScript(100, 101, ()=>{
-    location.replace("./homepage.html");
+    window.location.replace("./homepage.html");
+    window.location.href = "./homepage.html"
 }));
 
 

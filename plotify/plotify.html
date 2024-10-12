@@ -13,21 +13,21 @@
     </div>
     <h2>Plotify</h2>
     <canvas width="640" height="480" class="img" onmousedown="Mouse.mouseDown(event)" onmouseup="Mouse.mouseUp(event)" onmousemove="Mouse.mouseMove(event)" onmouseleave="Mouse.mouseOOB()" onmousewheel="Mouse.zoom(event)">:(</canvas>
-    <div style="display:grid; grid-template-columns: 31.5% 4.5% 29%; grid-template-rows: 50%; padding-top: 2px;">
+    <div style="display:grid; grid-template-columns: 31.5% 4.5% 29%; grid-template-rows: 50%; padding-top: 3px;">
         <div style="display: grid; grid-column: 2;">
-            <input  class="img" id="message" type="text" readonly="true" spellcheck="false" style="text-align: center;">
+            <input class="img" id="message" type="text" readonly="true" spellcheck="false" style="text-align: center;">
         </div>
         <div style="display: flex; justify-content: center; align-items: center;">
             <h3 > f ( x ) =&nbsp;
-                <span id="functionInput" contenteditable style="white-space: nowrap; background-color: white; border: 4px black solid; padding: 2px; border-radius: 4px;">sin(x)</span>
+                <span id="functionInput" contenteditable style="white-space: nowrap; border: 4px black solid; padding: 2px; border-radius: 4px; background-color: white;">sin(x)</span>
             </h3>
         </div>
     </div>
     <div style="text-align: center;">
         <h3>Matplotlib/mathematica ripoff</h3>
-        <h4>Min plan var att göra en pendel och härleda den men först ville jag ha en bra ode-lösare, vilket i sin tur krävde en grafritare.</h4>
-        <h4>Så nu tar vi ett problem i taget och löser en enkel grafritare :)</h4><hr>
-        <h4>En liten sidenote ang. polynom/potenser, skrivs här likt i python "a**b". (Testa '^' och försök lista ut vilket operator det är [tips: bitwise]) 
+        <h4>Min plan var att göra en pendel och härleda den men först ville jag ha en bra ode-lösare, vilket i sin tur krävde en grafritare.
+        <br>Så nu tar vi ett problem i taget och löser en enkel grafritare :)<hr>
+        <br>En liten sidenote ang. potenser, skrivs här likt i python "a**b". (Testa '^' och försök lista ut vilket operator det är [tips: bitwise]) 
         <br>Ett problem med javascript är att '-'-operatorn (en unary-operator) t.ex. -5 har högre prioritet än "**" vilket betyder att 2**-2 == √2 men, -2**2 ger ett error.
         <br>Mitt tips: spara inte på paranteserna så blir det nog bra. T.ex: (-2)**2, 2**(-1) osv.</h4>
     </div>
