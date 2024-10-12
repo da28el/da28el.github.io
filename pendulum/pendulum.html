@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pendulum</title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="vector2.js"></script>
+</head>
+<body>
+    <div id="HOME">
+        <a href="../homepage.html">
+            <img src="https://i.kym-cdn.com/entries/icons/original/000/000/142/feelsgoodman.png" width="40" height="20">
+        </a>
+    </div>
+    <h2>🌳3</h2>
+    <canvas width="720" height="480" class="img" onmousedown="Mouse.mouseDown(event)" onmouseup="Mouse.mouseUp(event)" onmousemove="Mouse.mouseMove(event)" onmouseleave="Mouse.mouseOOB()">:(</canvas>
+    <div>
+        <input id="theta" type="range" min="-3.14" max="3.14" step="0.01" value="0">
+        <math display="block">
+            <mrow>
+              <munderover>
+                <mo>∑</mo>
+                <mrow>
+                  <mi>n</mi>
+                  <mo>=</mo>
+                  <mn>1</mn>
+                </mrow>
+                <mrow>
+                  <mo>+</mo>
+                  <mn>∞</mn>
+                </mrow>
+              </munderover>
+              <mfrac>
+                <mn>1</mn>
+                <msup>
+                  <mi>n</mi>
+                  <mn>2</mn>
+                </msup>
+              </mfrac>
+              <mo>=</mo>
+            </mrow>
+          </math>
+    </div>
+    <script src="pendulum.js"></script>
+</body>

@@ -1,11 +1,11 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
-// import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { AirplaneControls } from 'airplane';
 
+
 let camera, controls, scene, renderer;
-let model;
+let model, water;
 let dirLight, ambLight;
 
 const dracoLoader = new DRACOLoader();
