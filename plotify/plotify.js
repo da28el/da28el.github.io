@@ -7,9 +7,9 @@ canvas.oncontextmenu = function (e) { e.preventDefault(); e.stopPropagation(); }
 const message = document.getElementById("message");
 
 // config
-const CANVAS_MAX_SIZE = 480;
 const sin = Math.sin;
 const cos = Math.cos;
+const tan = Math.tan;
 const PI = pi = Math.PI;
 const e = Math.E;
 const exp = Math.exp;

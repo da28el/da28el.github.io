@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>import matplotlib.jsplot as plt</title>
+    <style>
+        #HOME {
+            padding: 8px;
+            align-self: stretch;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Open Sans', sans-serif;
+        }
+
+        body {
+            background-color: rgb(176, 224, 230);
+            color: white;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: background-color 1.0s
+        }
+
+        h1 {
+            margin-top: 16px;
+            font-size: 32px;
+
+            background-image: linear-gradient(to right, #0066ff, #ff32d6);
+            background-size: 100%;
+            background-repeat: repeat;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; 
+            -moz-background-clip: text;
+            -moz-text-fill-color: transparent;
+
+        }
+
+        #board {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            row-gap: 10px;
+            column-gap: 10px;
+            margin-top: 64px;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            color: black;
+            text-shadow: 2px 2px white;
+            background-color: white;
+            border-style: solid;
+            border-color: white;
+            border-width: 4px;
+            border-radius: 10px;
+            box-shadow: 4px 4px 8px black;
+            font-size: 64px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.3s, text-shadow 0.3s, transform 0.3s;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .cell:hover {
+            background-color: whitesmoke;
+            color: black;
+            text-shadow: 2px 2px gray;
+            transform: scale(1.05);
+        }
+
+        .cell.pre {
+            pointer-events: none;
+            border-color: darkgray;
+            box-shadow: 4px 4px 8px black;
+            color: lightgray;
+            text-shadow: 2px 2px black;
+            transform: scale(0);
+            animation: pop-in 0.3s forwards;
+        }
+
+        @keyframes pop-in {
+            to {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes spin { 
+            100% { transform:rotate(360deg); } 
+        }
+
+        #message {
+            margin-top: 16px;
+            font-size: 64px;
+            transform: scale(0);
+        }
+
+        #message.anim {
+            animation: pop-in 1.0s forwards;
+        }
+
+        button {
+            margin-top: 24px;
+            padding: 8px 32px;
+            font-size: 16;
+            background-color: #0066ff;
+            color: #ecf0f1;
+            box-shadow: 4px 4px 8px black;
+            border: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:disabled {
+            background-color: gray;
+        }
+
+        #restart:hover {
+            content: '';
+            background-color: #004ec4;
+        }
+
+    </style>
+
+    <div id="HOME">
+        <a href="../homepage.html">
+        <img src="https://i.kym-cdn.com/entries/icons/original/000/000/142/feelsgoodman.png" width="40" height="20">
+    </a>
+</div>
+</head>
+<body>
+    <h1>Sudoku</h1>
+    <div id="radio">
+        <input type="radio" name="size" id="n1" checked="true">
+        <input type="radio" name="size" id="n2">
+        <input type="radio" name="size" id="n4">
+        <input type="radio" name="size" id="n9">
+        <input type="radio" name="size" id="n16">
+    </div>
+    <div id="board"></div>
+
+    <div id="message">✅</div>
+    <div>
+        <button id="restart">New Game</button>
+        <button id="nextLevel" disabled="true">Next Level</button>
+    </div>
+
+    <script src="sudoku.js" defer></script>
+</body>
