@@ -7,7 +7,62 @@
     <style>
         math {
             font-size: 22px;
+            background-color: whitesmoke;
+            padding: 4px;
+            border-radius: 10px;
         }
+        table {
+            border-collapse: collapse;
+            text-align: center;
+            font-size: 32px;
+            margin: 20px auto;
+            background-color: whitesmoke;
+            border-radius: 20px;
+        }
+        th, td {
+            padding: 8px;
+        }
+        /* Thicker border only for the second vertical line */
+        td:nth-child(2), th:nth-child(2) {
+            border-left: 2px solid black;
+        }
+        .divider td {
+            border-top: 2px solid black;
+        }
+        controls {
+            display: flex; flex-direction: column; align-items: center; margin: 5px;
+        }
+        @import url("https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap");
+
+        svg {
+            font-family: "Comic Neue", sans-serif;
+            width: 90%; height: 90%;
+        }
+        svg text {
+            animation: stroke 10s infinite alternate;
+            stroke-width: 2;
+            stroke: rgb(176, 224, 230);
+            font-size: 65px;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        @keyframes stroke {
+            0%   {
+                fill: rgba(255,255,255,0); stroke: rgb(179, 227, 233);
+                stroke-dashoffset: 25%; stroke-dasharray: 0 50%; stroke-width: 2;
+            }
+            70%  {fill: rgba(255,255,255,0); stroke: rgb(179, 227, 233); }
+            80%  {fill: rgba(255,255,255,0); stroke: rgb(180, 228, 234); stroke-width: 3; }
+            100% {
+                fill: rgba(255,255,255,0); stroke: rgb(181, 229, 235);
+                stroke-dashoffset: -25%; stroke-dasharray: 50% 0; stroke-width: 0;
+            }
+        }
+
+        .wrapper {background-color: powderblue};
     </style>
 </head>
 <body>
@@ -17,15 +72,221 @@
         </a>
     </div>
     <h2>ODE</h2>
-    <canvas width="480" height="360" class="img">:(</canvas>
+    <canvas width="480" height="360" class="img" onmousedown="Mouse.mouseDown(event)" onmouseup="Mouse.mouseUp(event)" onmousemove="Mouse.mouseMove(event)" onmouseleave="Mouse.mouseOOB()" onmousewheel="Mouse.zoom(event)">:(</canvas>
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; padding: 0px; gap: 10px;">
+        <div class="controls">
+            <input type="range" style="margin-bottom: 3px;" min="0.1" step="0.1" max="2" oninput="h = +this.value; plot();">
+            <h4 style="margin: 0;">timestep</h4>
+        </div>
+        <div class="controls">
+            <input type="checkbox" style="margin-bottom: 3px;" onchange="drawplots[0] = +this.checked; plot();">
+            <h4 style="margin: 0;">Euler</h4>
+        </div>
+        <div class="controls">
+            <input type="checkbox" style="margin-bottom: 3px;" onchange="drawplots[1] = +this.checked; plot();">
+            <h4 style="margin: 0;">Midpoint</h4>
+        </div>
+        <div class="controls">
+            <input type="checkbox" style="margin-bottom: 3px;" onchange="drawplots[2] = +this.checked; plot();">
+            <h4 style="margin: 0;">RK4</h4>
+        </div>
+        <div class="controls">
+            <input type="range" style="margin-bottom: 3px;" min="0.1" step="0.1" max="45" value="45" oninput="zoom = +this.value; plot();">
+            <h4 style="margin: 0;">zoom</h4>
+        </div>
+    </div>
     <div style="text-align: center;">
-        <h2>Ordinära differentialekvationer - ODE</h3>
-        <h3>Min plan var att göra en pendel och härleda den men först vill jag ha en bra ode-lösare.</h4>
-        <h3>Vi börjar med att definiera problemet:</h4>
-        <math display="block"><mfrac><mrow><mi>d</mi><mi>y</mi></mrow><mrow><mi>d</mi><mi>x</mi></mrow></mfrac><mo>=</mo><mi>f</mi><mrow><mo>(</mo><mrow><mi>y</mi><mo>,</mo><mi>x</mi></mrow><mo>)</mo></mrow></math></math>
-        <h3>Vi letar helt enkelt efter en funktion <math display="inline"><mi>f</mi></math> som vi utför derivering</h4>
-        <h3>Man kan såklart sätta <math display="inline"><mi>x</mi><mo>=</mo><mi>t</mi></math> för att få: </h4>
-        <math display="block"><mi>y</mi><mo>'</mo><mo>=</mo><mi>f</mi><mo>(</mo><mrow><mi>y</mi><mo>,</mo><mi>t</mi></mrow><mo>)</mo></math>
+        <h2>Ordinära differentialekvationer - ODE</h2>
+        <h3>Min plan var att göra en pendel men först vill jag ha en bra ode-lösare.</h3>
+        <h3>Vi börjar med att definiera problemet:</h3>
+        <math><mfrac><mrow><mi>d</mi><mi>y</mi></mrow><mrow><mi>d</mi><mi>x</mi></mrow></mfrac><mo>=</mo><mi>f</mi><mrow><mo>(</mo><mrow><mi>y</mi><mo>,</mo><mi>x</mi></mrow><mo>)</mo></mrow></math></math>
+        <h3>Vi säger att funktionen <math display="inline"><mi>f</mi></math> deriverar <math display="inline"><mi>y</mi></math> med avseende på <math display="inline"><mi>x</mi></math></h3>
+        <h3>Man kan såklart sätta <math display="inline"><mi>x</mi><mo>=</mo><mi>t</mi></math> för att få: </h3>
+        <math><mi>y</mi><mo>'</mo><mo>=</mo><mi>f</mi><mo>(</mo><mrow><mi>y</mi><mo>,</mo><mi>t</mi></mrow><mo>)</mo></math>
+        <h2>Eulers metod</h2>
+        <h3>Den lättaste lösningen är Eulers-metod: (aka Eulers stegmetod, Eulersteg, osv.)</h3>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mspace linebreak="newline"/><mi>y</mi><mo>'</mo><mo>=</mo><mi>f</mi><mo>(</mo><mi>y</mi><mo>,</mo><mi>t</mi><mo>)</mo><mo>,</mo><mo>&#xA0;</mo><msub><mi>y</mi><mn>0</mn></msub><mo>=</mo><mi>y</mi><mrow><mo>(</mo><mrow><msub><mi>t</mi><mn>0</mn></msub></mrow><mo>)</mo></mrow></math>
+        <br><br>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mspace linebreak="newline"/><mi>y</mi><mo>'</mo><mo>=</mo><mfrac><mrow><mi>&#x394;</mi><mi>y</mi></mrow><mrow><mi>&#x394;</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><msub><mi>y</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>-</mo><msub><mi>y</mi><mi>n</mi></msub></mrow><mrow><msub><mi>t</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>-</mo><msub><mi>t</mi><mi>n</mi></msub></mrow></mfrac><mo>&#x21d4;</mo><msub><mi>y</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>y</mi><mi>n</mi></msub><mo>+</mo><mi>y</mi><mo>'</mo><mi>&#x394;</mi><mi>t</mi></math>
+        <br><br>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mspace linebreak="newline"/><msub><mi>y</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>y</mi><mi>n</mi></msub><mo>+</mo><mi>f</mi><mo>(</mo><msub><mi>y</mi><mi>n</mi></msub><mo>,</mo><msub><mi>t</mi><mi>n</mi></msub><mo>)</mo><mi>&#x394;</mi><mi>t</mi></math>
+        <h3>Vi testar med det lättaste fallet:</h3>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>y</mi><mo>'</mo><mo>=</mo><mi>y</mi><mo>,</mo><mo>&#xA0;</mo><msub><mi>y</mi><mn>0</mn></msub><mo>=</mo><mn>1</mn></math>
+        <h3>Vilket ger oss: (tidsinvariant)</h3>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>f</mi><mo>(</mo><mi>y</mi><mo>,</mo><mi>t</mi><mo>)</mo><mo>=</mo><mi>y</mi></math>
+        <br><br>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>y</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>y</mi><mi>n</mi></msub><mo>+</mo><msub><mi>y</mi><mi>n</mi></msub><mi>&#x394;</mi><mi>t</mi><mo>=</mo><msub><mi>y</mi><mi>n</mi></msub><mrow><mo>(</mo><mrow><mn>1</mn><mo>+</mo><mi>&#x394;</mi><mi>t</mi></mrow><mo>)</mo></mrow></math>
+        <h3>Man ser snabbt i plotten att Eulers metod underskattar funktionsvärdet.
+        <br>Man kan räkna ut felet med hjälp av en annan härledning av Eulers metod.
+        <br>Vi börjar med taylor-serien för <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>y</mi></math> i punkt <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>a</mi></math>:
+        </h3>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>y</mi><mo form="prefix" stretchy="false">(</mo><mi>t</mi><mo form="postfix" stretchy="false">)</mo><mo>=</mo><mi>y</mi><mo form="prefix" stretchy="false">(</mo><mi>a</mi><mo form="postfix" stretchy="false">)</mo><mo>+</mo><msup><mi>y</mi><mo lspace="0em" rspace="0em" class="tml-prime">&#x2032;</mo></msup><mo form="prefix" stretchy="false">(</mo><mi>a</mi><mo form="postfix" stretchy="false">)</mo><mo form="prefix" stretchy="false">(</mo><mi>t</mi><mo>&#x2212;</mo><mi>a</mi><mo form="postfix" stretchy="false">)</mo><mo>+</mo><mfrac><mrow><msup><mi>y</mi><mrow><mo class="tml-prime">&#x2032;</mo><mo class="tml-prime">&#x2032;</mo></mrow></msup><mo form="prefix" stretchy="false">(</mo><mi>a</mi><mo form="postfix" stretchy="false">)</mo></mrow><mrow><mn>2</mn><mi>!</mi></mrow></mfrac><mo form="prefix" stretchy="false">(</mo><mi>t</mi><mo>&#x2212;</mo><mi>a</mi><msup><mo form="postfix" stretchy="false">)</mo><mn>2</mn></msup><mo>+</mo><mo separator="true">.</mo><mo separator="true">.</mo><mo separator="true">.</mo><mo>=</mo><mrow><munderover><mo movablelimits="false">&#x2211;</mo><mrow><mi>n</mi><mo>=</mo><mn>0</mn></mrow><mi>&#x221e;</mi></munderover></mrow><mfrac><mrow><msup><mi>y</mi><mrow><mo form="prefix" stretchy="false">(</mo><mi>n</mi><mo form="postfix" stretchy="false">)</mo></mrow></msup><mo form="prefix" stretchy="false">(</mo><mi>a</mi><mo form="postfix" stretchy="false">)</mo></mrow><mrow><mi>n</mi><mi>!</mi></mrow></mfrac><mo form="prefix" stretchy="false">(</mo><mi>t</mi><mo>&#x2212;</mo><mi>a</mi><msup><mo form="postfix" stretchy="false">)</mo><mi>n</mi></msup></mrow></math>
+        <h3>Nu byter vi ut <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>y'</mi></math> mot <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>f</mi><mo>(</mo><mi>y</mi><mo>,</mo><mi>t</mi><mo>)</mo></math> med <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>a</mi><mo>=</mo><msub><mi>t</mi><mi>n</mi></msub></math> och skriver det i diskret form:</h3>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>y</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>y</mi><mi>n</mi></msub><mo>+</mo><mi>f</mi><mo form="prefix" stretchy="false">(</mo><msub><mi>y</mi><mi>n</mi></msub><mo separator="true">,</mo><msub><mi>t</mi><mi>n</mi></msub><mo form="postfix" stretchy="false">)</mo><mo form="prefix" stretchy="false">(</mo><msub><mi>t</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>&#x2212;</mo><msub><mi>t</mi><mi>n</mi></msub><mo form="postfix" stretchy="false">)</mo><mo>+</mo><mfrac><mrow><msup><mi>f</mi><mo lspace="0em" rspace="0em" class="tml-prime">&#x2032;</mo></msup><mo form="prefix" stretchy="false">(</mo><msub><mi>y</mi><mi>n</mi></msub><mo separator="true">,</mo><msub><mi>t</mi><mi>n</mi></msub><mo form="postfix" stretchy="false">)</mo></mrow><mrow><mn>2</mn><mi>!</mi></mrow></mfrac><mo form="prefix" stretchy="false">(</mo><msub><mi>t</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>&#x2212;</mo><msub><mi>t</mi><mi>n</mi></msub><msup><mo form="postfix" stretchy="false">)</mo><mn>2</mn></msup><mo>+</mo><mo separator="true">.</mo><mo separator="true">.</mo><mo separator="true">.</mo><mo>+</mo><mfrac><mrow><msup><mi>f</mi><mrow><mo form="prefix" stretchy="false">(</mo><mi>n</mi><mo form="postfix" stretchy="false">)</mo></mrow></msup><mo form="prefix" stretchy="false">(</mo><msub><mi>y</mi><mi>n</mi></msub><mo separator="true">,</mo><msub><mi>t</mi><mi>n</mi></msub><mo form="postfix" stretchy="false">)</mo></mrow><mrow><mi>n</mi><mi>!</mi></mrow></mfrac><mo form="prefix" stretchy="false">(</mo><msub><mi>t</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>&#x2212;</mo><msub><mi>t</mi><mi>n</mi></msub><msup><mo form="postfix" stretchy="false">)</mo><mi>n</mi></msup></mrow></math>
+        <h3>Med <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo form="prefix" stretchy="false">(</mo><msub><mi>t</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>&#x2212;</mo><msub><mi>t</mi><mi>n</mi></msub><mo form="postfix" stretchy="false">)</mo><mo>=</mo><mi>&#x394;</mi><mi>t</mi></mrow></math> blir de första två termerna:</h3>
+            <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>y</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>y</mi><mi>n</mi></msub><mo>+</mo><mi>f</mi><mo form="prefix" stretchy="false">(</mo><msub><mi>y</mi><mi>n</mi></msub><mo separator="true">,</mo><msub><mi>t</mi><mi>n</mi></msub><mo form="postfix" stretchy="false">)</mo><mi>&#x394;</mi><mi>t</mi></mrow></math>
+        <h3>Det ser ju i princip exakt ut som uttrycket för Eulers metod.
+        <br>Därför kan vi subtrahera bort uttrycket för Eulers metod från taylor-utvecklingen och få felet:
+        </h3>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>&#x3b5;</mi><mi>n</mi></msub><mo>=</mo><mrow><munderover><mo movablelimits="false">&#x2211;</mo><mrow><mi>n</mi><mo>=</mo><mn>2</mn></mrow><mi>&#x221e;</mi></munderover></mrow><mfrac><mrow><msup><mi>f</mi><mrow><mo form="prefix" stretchy="false">(</mo><mi>n</mi><mo form="postfix" stretchy="false">)</mo></mrow></msup><mo form="prefix" stretchy="false">(</mo><msub><mi>y</mi><mi>n</mi></msub><mo separator="true">,</mo><msub><mi>t</mi><mi>n</mi></msub><mo form="postfix" stretchy="false">)</mo></mrow><mrow><mi>n</mi><mi>!</mi></mrow></mfrac><mi>&#x394;</mi><msup><mi>t</mi><mi>n</mi></msup><mo>=</mo><mfrac><mrow><msup><mi>f</mi><mo lspace="0em" rspace="0em" class="tml-prime">&#x2032;</mo></msup><mo form="prefix" stretchy="false">(</mo><msub><mi>y</mi><mi>n</mi></msub><mo separator="true">,</mo><msub><mi>t</mi><mi>n</mi></msub><mo form="postfix" stretchy="false">)</mo></mrow><mrow><mn>2</mn><mi>!</mi></mrow></mfrac><mi>&#x394;</mi><msup><mi>t</mi><mn>2</mn></msup><mo>+</mo><mo separator="true">.</mo><mo separator="true">.</mo><mo separator="true">.</mo><mo>+</mo><mfrac><mrow><msup><mi>f</mi><mrow><mo form="prefix" stretchy="false">(</mo><mi>n</mi><mo form="postfix" stretchy="false">)</mo></mrow></msup><mo form="prefix" stretchy="false">(</mo><msub><mi>y</mi><mi>n</mi></msub><mo separator="true">,</mo><msub><mi>t</mi><mi>n</mi></msub><mo form="postfix" stretchy="false">)</mo></mrow><mrow><mi>n</mi><mi>!</mi></mrow></mfrac><mi>&#x394;</mi><msup><mi>t</mi><mi>n</mi></msup></mrow></math>
+        <h3>Hur ska vi då göra för att minska felet?
+        <br>En bra start kan ju vara att plocka lite fler termer från taylor-serien, då tar det längre tid för felet att ackumuleras.
+        <br>Problemet blir att derivera <math><mi>f</mi></math>...
+        <br>
+        <br>Kan det finnas något annat sätt att minska felet?
+        </h3>
+        <div style="display: flex; justify-content: center;">
+            <h3>Eftersom vi räknar med derivatan i punkt <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>n</mi></math> kommer 
+            <br>den hinna ändras hos lösningen innan vi når punkt <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>n</mi><mo>+</mo><mi>1</mi></math>.
+            <br>Om man istället tar ett eulersteg från <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>n</mi><mo>-</mo><mi>1</mi></math> till <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>n</mi></math> och sedan ett till <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>n</mi><mo>+</mo><mi>1</mi></math>
+            <br>och räknar derivatan från <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>n</mi><mo>-</mo><mi>1</mi></math> till <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>n</mi><mo>+</mo><mi>1</mi></math>
+            <br>borde den stämma bättre överens med den sanna funktionen.
+            <br>
+            <br>Kolla bara på dom gröna linjerna, dom ser ju ut att stämma rätt bra, 
+            <br>vi måste bara komma ihåg att dela med 2.
+            </h3>
+            <img src="eulerError.png" style="padding: 4px; border-radius: 20px;">
+        </div>
+        <h2>Mittpunktsmetoden</h2>
+        <h3>Mittpunktsmetoden/modifierat eulersteg: (likt trapetsmetoden)
+        <br>För att ta vårt extra steg kan vi ju helt enkelt mata funktionen <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>f</mi></math> med sig själv.
+        </h3>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mspace linebreak="newline"/><mi>y</mi><mo>'</mo><mo>=</mo><mi>f</mi><mo>(</mo><mi>y</mi><mo>,</mo><mi>t</mi><mo>)</mo><mo>,</mo><mo>&#xA0;</mo><msub><mi>y</mi><mn>0</mn></msub><mo>=</mo><mi>y</mi><mrow><mo>(</mo><mrow><msub><mi>t</mi><mn>0</mn></msub></mrow><mo>)</mo></mrow></math>
+        <br><br>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>y</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>y</mi><mi>n</mi></msub><mo>+</mo><mi>f</mi><mo form="prefix" stretchy="false">(</mo><msub><mi>y</mi><mi>n</mi></msub><mo>+</mo><mi>f</mi><mo form="prefix" stretchy="false">(</mo><msub><mi>y</mi><mi>n</mi></msub><mo separator="true">,</mo><msub><mi>t</mi><mi>n</mi></msub><mo form="postfix" stretchy="false">)</mo><mfrac><mrow><mi>&#x394;</mi><mi>t</mi></mrow><mn>2</mn></mfrac><mo separator="true">,</mo><msub><mi>t</mi><mi>n</mi></msub><mo>+</mo><mfrac><mrow><mi>&#x394;</mi><mi>t</mi></mrow><mn>2</mn></mfrac><mo form="postfix" stretchy="false">)</mo><mi>&#x394;</mi><mi>t</mi></mrow></math>
+        <h3>I exemplet <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>y</mi><mo lspace="0em" rspace="0em">&#x2032;</mo></msup><mo>=</mo><mi>y</mi><mo>=</mo><mi>f</mi><mo form="prefix" stretchy="false">(</mo><mi>y</mi><mo separator="true">,</mo><mi>t</mi><mo form="postfix" stretchy="false">)</mo><mo separator="true">,</mo><msub><mi>y</mi><mn>0</mn></msub><mo>=</mo><mi>y</mi><mo form="prefix" stretchy="false">(</mo><msub><mi>t</mi><mn>0</mn></msub><mo form="postfix" stretchy="false">)</mo><mo>=</mo><mn>1</mn></mrow></math>
+            blir mittpunktssteget:
+        </h3>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>y</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>y</mi><mi>n</mi></msub><mo>+</mo><msub><mi>y</mi><mi>n</mi></msub><mi>&#x394;</mi><mi>t</mi><mo>+</mo><msub><mi>y</mi><mi>n</mi></msub><mfrac><mrow><mi>&#x394;</mi><msup><mi>t</mi><mn>2</mn></msup></mrow><mn>2</mn></mfrac></mrow></math>
+        <h3>Vilket är Eulersteget med en extra term från taylor-serien. I plotten syns att mittpunktsmetoden är betydligt bättre än Eulers metod.
+        <br>Men vi har fler termer i taylor-serien så vi kan hitta en bättre lösning.
+        </h3>
+        <br>
+        <h2>Runge-Kutta 4</h2>
+        <h3>Alla metoderna ovan är del av Runge-Kutta familjen.
+        <br>RK4 blir sista bossen idag.
+        <br>Då Eulersteget inkluderar 2 termer från taylor-utvecklingen kallar vi den en första ordningens Runge-Kutta metod. (Vi räknar inte första termen)
+        <br>Då följer att mittpunktsmetoden blir en andra ordningens RK metod.
+        <br>Vi skiter i 3:dje ordningens metoder och går direkt på 4:de
+        </h3>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>y</mi><mo lspace="0em" rspace="0em">&#x2032;</mo></msup><mo>=</mo><mi>f</mi><mo form="prefix" stretchy="false">(</mo><mi>y</mi><mo separator="true">,</mo><mi>t</mi><mo form="postfix" stretchy="false">)</mo><mo separator="true">,</mo><msub><mi>y</mi><mn>0</mn></msub><mo>=</mo><mi>y</mi><mo form="prefix" stretchy="false">(</mo><msub><mi>t</mi><mn>0</mn></msub><mo form="postfix" stretchy="false">)</mo></mrow></math>
+        <br><br>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>k</mi><mn>1</mn></msub><mo>=</mo><mi>f</mi><mo form="prefix" stretchy="false">(</mo><msub><mi>y</mi><mi>n</mi></msub><mo separator="true">,</mo><msub><mi>t</mi><mi>n</mi></msub><mo form="postfix" stretchy="false">)</mo></mrow></math>
+        <br><br>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>k</mi><mn>2</mn></msub><mo>=</mo><mi>f</mi><mo form="prefix" stretchy="false">(</mo><msub><mi>y</mi><mi>n</mi></msub><mo>+</mo><mfrac><msub><mi>k</mi><mn>1</mn></msub><mn>2</mn></mfrac><mi>&#x394;</mi><mi>t</mi><mo separator="true">,</mo><msub><mi>t</mi><mi>n</mi></msub><mo>+</mo><mfrac><mrow><mi>&#x394;</mi><mi>t</mi></mrow><mn>2</mn></mfrac><mo form="postfix" stretchy="false">)</mo></mrow></math>
+        <br><br>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>k</mi><mn>3</mn></msub><mo>=</mo><mi>f</mi><mo form="prefix" stretchy="false">(</mo><msub><mi>y</mi><mi>n</mi></msub><mo>+</mo><mfrac><msub><mi>k</mi><mn>2</mn></msub><mn>2</mn></mfrac><mi>&#x394;</mi><mi>t</mi><mo separator="true">,</mo><msub><mi>t</mi><mi>n</mi></msub><mo>+</mo><mfrac><mrow><mi>&#x394;</mi><mi>t</mi></mrow><mn>2</mn></mfrac><mo form="postfix" stretchy="false">)</mo></mrow></math>
+        <br><br>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>k</mi><mn>4</mn></msub><mo>=</mo><mi>f</mi><mo form="prefix" stretchy="false">(</mo><msub><mi>y</mi><mi>n</mi></msub><mo>+</mo><msub><mi>k</mi><mn>3</mn></msub><mi>&#x394;</mi><mi>t</mi><mo separator="true">,</mo><msub><mi>t</mi><mi>n</mi></msub><mo>+</mo><mi>&#x394;</mi><mi>t</mi><mo form="postfix" stretchy="false">)</mo></mrow></math>
+        <br><br>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>y</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>y</mi><mi>n</mi></msub><mo>+</mo><mfrac><mrow><mi>&#x394;</mi><mi>t</mi></mrow><mn>6</mn></mfrac><mo form="prefix" stretchy="false">(</mo><msub><mi>k</mi><mn>1</mn></msub><mo>+</mo><mn>2</mn><msub><mi>k</mi><mn>1</mn></msub><mo>+</mo><mn>2</mn><msub><mi>k</mi><mn>3</mn></msub><mo>+</mo><msub><mi>k</mi><mn>4</mn></msub><mo form="postfix" stretchy="false">)</mo></mrow></math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>y</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>y</mi><mi>n</mi></msub><mo>+</mo><msub><mi>y</mi><mi>n</mi></msub><mi>&#x394;</mi><mi>t</mi><mo>+</mo><msub><mi>y</mi><mi>n</mi></msub><mfrac><mrow><mi>&#x394;</mi><msup><mi>t</mi><mn>2</mn></msup></mrow><mn>2</mn></mfrac></mrow></math>
+        <h3>Här tar man 4 skattningar och räknar ut ett viktat genomsnitt av derivatan. Hemläxa blir att härleda 
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>y</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msub></math>
+             
+            för:</h3>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msup><mi>y</mi><mo lspace="0em" rspace="0em">&#x2032;</mo></msup><mo>=</mo><mi>y</mi><mo>=</mo><mi>f</mi><mo form="prefix" stretchy="false">(</mo><mi>y</mi><mo separator="true">,</mo><mi>t</mi><mo form="postfix" stretchy="false">)</mo><mo separator="true">,</mo><msub><mi>y</mi><mn>0</mn></msub><mo>=</mo><mi>y</mi><mo form="prefix" stretchy="false">(</mo><msub><mi>t</mi><mn>0</mn></msub><mo form="postfix" stretchy="false">)</mo><mo>=</mo><mn>1</mn></mrow></math>
+        <h3>Fet hint: det är en <i>fjärde</i> ordningens metod</h3>
+        <br>
+        <h3>Formeln för RK4 ser ut som en röra så för att snygga till det finns Butcher-tabellen:</h3>
+
+        <table>
+            <tr>
+                <td><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>c</mi><mn>1</mn></msub></math></td>
+                <td><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>a</mi><mn>11</mn></msub></math></td>
+                <td><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>a</mi><mn>12</mn></msub></math></td>
+                <td>...</td>
+                <td><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>a</mi><mn>1s</mn></msub></math></td>
+            </tr>
+            <tr>
+                <td><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>c</mi><mn>2</mn></msub></math></td>
+                <td><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>a</mi><mn>21</mn></msub></math></td>
+                <td><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>a</mi><mn>22</mn></msub></math></td>
+                <td>...</td>
+                <td><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>a</mi><mn>2s</mn></msub></math></td>
+            </tr>
+            <tr>
+                <td>⋮</td>
+                <td>⋮</td>
+                <td></td>
+                <td>⋱</td>
+                <td>...</td>
+            </tr>
+            <tr>
+                <td><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>C</mi><mn>s</mn></msub></math></td>
+                <td><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>a</mi><mn>s1</mn></msub></math></td>
+                <td><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>a</mi><mn>s2</mn></msub></math></td>
+                <td>...</td>
+                <td><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>a</mi><mn>ss</mn></msub></math></td>
+            </tr>
+            <tr class="divider">
+                <td></td>
+                <td><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>b</mi><mn>1</mn></msub></math></td>
+                <td><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>b</mi><mn>2</mn></msub></math></td>
+                <td>...</td>
+                <td><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>b</mi><mn>s</mn></msub></math></td>
+            </tr>
+        </table>
+        <h3>Där:</h3>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mrow><munderover><mo movablelimits="false">&#x2211;</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>s</mi></munderover></mrow><msub><mi>b</mi><mi>i</mi></msub><mo>=</mo><mn>1</mn></mrow></math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mrow><munderover><mo movablelimits="false">&#x2211;</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>s</mi></munderover></mrow><msub><mi>a</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>=</mo><msub><mi>c</mi><mi>i</mi></msub></mrow></math>
+        <h3>RK4:s tabell:</h3>
+        <table>
+            <tr>
+                <td>0</td><td></td><td></td><td></td><td></td>
+            </tr>
+            <tr>
+                <td>½</td><td>½</td><td></td><td></td><td></td>
+            </tr>
+            <tr>
+                <td>½</td><td>0</td><td>½</td><td></td><td></td>
+            </tr>
+            <tr>
+                <td>1</td><td>0</td><td>0</td><td>1</td><td></td>
+            </tr>
+            <tr class="divider">
+                <td></td><td>⅙</td><td>⅓</td><td>⅓</td><td>⅙</td>
+            </tr>
+        </table>
+
+        <h3>Tabellerna ovan kan användas i formeln:</h3>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>k</mi><mrow><mi>n</mi><mi>i</mi></mrow></msub><mo>=</mo><mi>f</mi><mo form="prefix" stretchy="false">(</mo><msub><mi>y</mi><mi>n</mi></msub><mo>+</mo><mi>&#x394;</mi><mi>t</mi><mrow><munderover><mo movablelimits="false">&#x2211;</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>i</mi><mo>&#x2212;</mo><mn>1</mn></mrow></munderover></mrow><msub><mi>a</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><msub><mi>k</mi><mrow><mi>n</mi><mi>j</mi></mrow></msub><mo separator="true">,</mo><msub><mi>t</mi><mi>n</mi></msub><mo>+</mo><msub><mi>c</mi><mi>i</mi></msub><mi>&#x394;</mi><mi>t</mi><mo form="postfix" stretchy="false">)</mo></mrow></math>
+        <br><br>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>y</mi><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mi>y</mi><mi>n</mi></msub><mo>+</mo><mi>&#x394;</mi><mi>t</mi><mrow><munderover><mo movablelimits="false">&#x2211;</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>s</mi></munderover></mrow><msub><mi>b</mi><mi>i</mi></msub><msub><mi>k</mi><mrow><mi>n</mi><mi>i</mi></mrow></msub></mrow></math>
+        <br><br>
+        <h3>Och här är Butcher-tabellerna för <u>Euler</u>:</h3>
+        
+        <table>
+            <tr>
+                <td>0</td><td></td>
+            </tr>
+            <tr class="divider">
+                <td></td><td>1</td>
+            </tr>
+        </table>
+        <h3>och för <u>midpoint</u>:</h3>
+        <table>
+            <tr>
+                <td>0</td><td></td><td></td>
+            </tr>
+            <tr>
+                <td>α</td><td>α</td><td></td>
+            </tr>
+            <tr class="divider">
+                <td></td><td><math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo form="prefix" stretchy="false">(</mo><mn>1</mn><mo>&#x2212;</mo><mfrac><mn>1</mn><mrow><mn>2</mn><mi>&#x3b1;</mi></mrow></mfrac><mo form="postfix" stretchy="false">)</mo></mrow></math></td><td><math xmlns="http://www.w3.org/1998/Math/MathML"><mfrac><mn>1</mn><mrow><mn>2</mn><mi>&#x3b1;</mi></mrow></mfrac></math></td>
+            </tr>
+        </table>
+        <h3>Där <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>&#x3b1;</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac></mrow></math> Ger mittpunktsmetoden och <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>&#x3b1;</mi><mo>=</mo><mn>1</mn></mrow></math> ger Heuns metod.</h3>        
+        <br><br>
+        <h3>Så alla dessa metoder är bara diskreta integratorer, vilket inte låter särskillt spännande...</h3>
+        <div class="wrapper">
+            <svg>
+                <text x="50%" y="50%" dy=".4em" text-anchor="middle">
+                    RÖSTERNA ÄR TILLBAKA
+                </text>
+            </svg>
+        </div>
+        <img src="integration.png">
     </div>
     <script src="ode.js"></script>
 </body>
