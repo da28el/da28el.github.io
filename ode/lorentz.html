@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ODE</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        math {
+            font-size: 22px;
+            background-color: whitesmoke;
+            padding: 4px;
+            border-radius: 10px;
+            margin-top: -40px;
+        }
+        canvas {
+            position: absolute;
+            margin-left: auto;
+            margin-right: auto;
+            left: 0;
+            right: 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="HOME">
+        <a href="../homepage.html">
+            <img src="https://i.kym-cdn.com/entries/icons/original/000/000/142/feelsgoodman.png" width="40" height="20">
+        </a>
+    </div>
+    <h2>ODE</h2>
+    <div style="display: flex;">
+        <canvas width="480" height="360" class="img" style="z-index: -1; background-color: white;"></canvas>
+        <canvas width="480" height="360" class="img" id="overlay" style="z-index: 1;">:(</canvas>
+        <canvas width="480" height="360" class="img" id="background" style="z-index: 0;">:(</canvas>
+    </div>
+    
+    <div style="text-align: center; margin-top: 370px;">
+        <h2>Lorentz-attraktorn</h2>
+        <h3>Min plan var att göra en pendel men nu när jag har en bra ode-lösare måste jag visa den.</h3>
+        <h3>Lorentz-attraktorn bygger på ett system av differentialekvationer (ett differentialekvationssystem):</h3>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover><mi>x</mi><mo stretchy="false" style="math-style:normal;math-depth:0;">&#x2d9;</mo></mover><mo>=</mo><mi>&#x3c3;</mi><mo form="prefix" stretchy="false">(</mo><mi>y</mi><mo>&#x2212;</mo><mi>x</mi><mo form="postfix" stretchy="false">)</mo></mrow></math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover><mi>y</mi><mo stretchy="false" style="math-style:normal;math-depth:0;">&#x2d9;</mo></mover><mo>=</mo><mi>x</mi><mo form="prefix" stretchy="false">(</mo><mi>&#x3c1;</mi><mo>&#x2212;</mo><mi>z</mi><mo form="postfix" stretchy="false">)</mo><mo>&#x2212;</mo><mi>y</mi></mrow></math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover><mi>z</mi><mo stretchy="false" style="math-style:normal;math-depth:0;">&#x2d9;</mo></mover><mo>=</mo><mi>x</mi><mi>y</mi><mo>&#x2212;</mo><mi>&#x3b2;</mi><mi>z</mi></mrow></math>
+        <h3>med:</h3>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>&#x3c3;</mi><mo>=</mo><mn>1</mn><mn>0</mn></mrow></math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>&#x3c3;</mi><mo>=</mo><mn>2</mn><mn>8</mn></mrow></math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>&#x3b2;</mi><mo>=</mo><mfrac><mn>3</mn><mn>8</mn></mfrac></mrow></math>
+
+        <h3>Lore för nördar:
+        <br>Systemet är en förenkling av en modell för atmosfärisk konvektion,
+        <br>där koordinaterna beskriver egenskaper hos systemet.
+        <br>Mer info finns online, jag var bara ute efter ett snyggt exempel.
+        <br>Det som däremot är spännande är att den röda, gröna och den blåa pricken började på nästan samma position, bara 1/200 pixlar ifrån varandra.
+        <br>En sån liten skillnad kan väl inte spela någon roll för resultatet?
+        <br>
+        <br>Enter kaosteori,
+        <br>Ja, Lorentz-attraktorn var källan till kaosteori och därmed Fjärilseffekten.
+        <br>Kollar man tillräckligt länge ser man att systemet är kaotiskt.
+        </h3>
+
+    </div>
+    <script src="lorentz.js"></script>
+</body>

@@ -106,7 +106,6 @@ function clear() {
     ctx.fillRect(0, offset[1], width, 2);
     ctx.fillStyle = "#0000ff";
     ctx.fillRect(offset[0], 0, 2, height);
-
 }
 
 plot();
