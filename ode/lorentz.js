@@ -37,8 +37,6 @@ function rk4(y, dt) {
     return add(y, mul(dt/6, add(add(add(k1, mul(2, k2)), mul(2, k3)), k4)));
 }
 
-// ctx1.fillStyle = "#ffffff";
-// ctx1.fillRect(0,0,width,height);
 v1 = [0,1,1.05];
 v2 = [0,1,1.051];
 v3 = [0,1,1.053];
@@ -47,7 +45,7 @@ const dt = 0.01;
 
 function loop(){
     ctx2.clearRect(0, 0, width, height);
-    ctx1.strokeStyle = "rgba(255,0,0,0.5)";//"#ff0000";
+    ctx1.strokeStyle = "rgba(255,0,0,0.5)";
     ctx1.beginPath();
     ctx1.moveTo(width/2 + v1[0]*5, height/2 - v1[1]*5);
     v1 = rk4(v1, dt);

@@ -117,8 +117,6 @@ const Mouse = {
     dy: 0,
     click: false,
     mouseDown: (e) => {
-        // Mouse.dx = Mouse.x;
-        // Mouse.dy = Mouse.y;
         Mouse.click = true;
     },
     mouseUp: (e) => {
