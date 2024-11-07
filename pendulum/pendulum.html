@@ -3,6 +3,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>pendulum</title>
+    <style>
+        math {
+            font-size: 23px;
+            margin-top: -20px;
+            margin-bottom: -20px;
+        }
+    </style>
     <link rel="stylesheet" href="../style.css">
     <script src="vector2.js"></script>
 </head>
@@ -12,34 +19,85 @@
             <img src="https://i.kym-cdn.com/entries/icons/original/000/000/142/feelsgoodman.png" width="40" height="20">
         </a>
     </div>
-    <h2>🌳3</h2>
+    <h2>Pendel</h2>
     <canvas width="720" height="480" class="img" onmousedown="Mouse.mouseDown(event)" onmouseup="Mouse.mouseUp(event)" onmousemove="Mouse.mouseMove(event)" onmouseleave="Mouse.mouseOOB()">:(</canvas>
-    <div>
-        <input id="theta" type="range" min="-3.14" max="3.14" step="0.01" value="0">
-        <math display="block">
-            <mrow>
-              <munderover>
-                <mo>∑</mo>
-                <mrow>
-                  <mi>n</mi>
-                  <mo>=</mo>
-                  <mn>1</mn>
-                </mrow>
-                <mrow>
-                  <mo>+</mo>
-                  <mn>∞</mn>
-                </mrow>
-              </munderover>
-              <mfrac>
-                <mn>1</mn>
-                <msup>
-                  <mi>n</mi>
-                  <mn>2</mn>
-                </msup>
-              </mfrac>
-              <mo>=</mo>
-            </mrow>
-          </math>
+    <div style="display: flex; justify-self: center;">
+        <div>
+            <label>velocity</label>
+            <input type="checkbox" onchange="showV = this.checked">
+        </div>
+        <h1>&emsp;</h1>
+        <div>
+            <label>acceleration</label>
+            <input type="checkbox" onchange="showA = this.checked">
+        </div>
+        <h1>&emsp;</h1>
+        <div>
+            <label>gravity</label>
+            <input type="checkbox" onchange="showG = this.checked">
+        </div>
     </div>
+    <div style="margin-left: 10%;">
+        <h4>Alla accelerationer (a, g + komposanter) är skalade med en faktor 5 för att det ska gå att se, varsågod.</h4>
+        <h3>Newton</h3>
+        <h4>Okej, den enda kraften som verkar på pendeln är gravitationen.
+            <br>Vi kan enkelt splitta up den i komposanter (radiell och tangentell [checka <i>gravity</i>]) med lite trig.
+            <br>Armen är stel och kommer att motverka all kraft i radiell riktning (<i>gr</i>) så vi blir bara kvar med den tangentella kraften (<i>gt</i>).
+            <br>Vilket ger:
+        </h4>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mo movablelimits="false">&#x2211;</mo><mi>f</mi><mo>=</mo><mi>m</mi><mi>a</mi><mo>=</mo><mo>&#x2212;</mo><mi>m</mi><mi>g</mi><mo>&#xb7;</mo><mi>s</mi><mi>i</mi><mi>n</mi><mo form="prefix" stretchy="false">(</mo><mi>&#x3b8;</mi><mo form="postfix" stretchy="false">)</mo></mrow></math>
+        <br><br>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>=</mo><mo>&#x2212;</mo><mi>g</mi><mo>&#xb7;</mo><mi>s</mi><mi>i</mi><mi>n</mi><mo form="prefix" stretchy="false">(</mo><mi>&#x3b8;</mi><mo form="postfix" stretchy="false">)</mo></mrow></math>
+        <br>
+        <h4>För att hitta den svepta sträckan kan vi använda formeln för båglängden i polära koordinater:</h4>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi><mo>=</mo><msub><mo movablelimits="false">&#x222b;</mo><mrow></mrow></msub><msqrt><mrow><mrow><mfenced open='(' close=')'><mfrac><mrow><mi>d</mi><mi>r</mi></mrow><mrow><mi>d</mi><mi>&#x3b8;</mi></mrow></mfrac></mfenced></mrow><mo>+</mo><msup><mi>r</mi><mn>2</mn></msup></mrow></msqrt><mi>d</mi><mi>&#x3b8;</mi></mrow></math>
+        <br>
+        <h4>Här är armens längd konstant vilket innebär
+            <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi>d</mi><mi>r</mi></mrow><mrow><mi>d</mi><mi>&#x3b8;</mi></mrow></mfrac><mo>=</mo><mn>0</mn></mrow></math>
+            och ger:</h4>
+            <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>s</mi><mo>=</mo><mo movablelimits="false">&#x222b;</mo><msqrt><msup><mi>r</mi><mn>2</mn></msup></msqrt><mi>d</mi><mi>&#x3b8;</mi><mo>=</mo><mo movablelimits="false">&#x222b;</mo><mi>r</mi><mi>d</mi><mi>&#x3b8;</mi><mo>=</mo><mi>r</mi><mi>&#x3b8;</mi></mrow></math>
+        <h4>Då kan vi enkelt säga att:</h4>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>=</mo><mover><mi>s</mi><mo stretchy="false" style="math-style:normal;math-depth:0;">&#xa8;</mo></mover><mo>=</mo><mi>r</mi><mover><mi>&#x3b8;</mi><mo stretchy="false" style="math-style:normal;math-depth:0;">&#xa8;</mo></mover></mrow></math>
+        <h4>Vilket leder till:</h4>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>r</mi><mover><mi>&#x3b8;</mi><mo stretchy="false" style="math-style:normal;math-depth:0;">&#xa8;</mo></mover><mo>=</mo><mo>&#x2212;</mo><mi>g</mi><mo>&#xb7;</mo><mi>s</mi><mi>i</mi><mi>n</mi><mo form="prefix" stretchy="false">(</mo><mi>&#x3b8;</mi><mo form="postfix" stretchy="false">)</mo></mrow></math>
+        <br><br>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover><mi>&#x3b8;</mi><mo stretchy="false" style="math-style:normal;math-depth:0;">&#xa8;</mo></mover><mo>=</mo><mo>&#x2212;</mo><mfrac><mi>g</mi><mi>r</mi></mfrac><mo>&#xb7;</mo><mi>s</mi><mi>i</mi><mi>n</mi><mo form="prefix" stretchy="false">(</mo><mi>&#x3b8;</mi><mo form="postfix" stretchy="false">)</mo></mrow></math>
+        <h4>Kaboom! Där har vi vår diff-ekv.</h4>
+        <h3>Lagrange</h3>
+        <h4>Denna metod bygger på Euler-Lagrange ekvationen:</h4>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mi>d</mi><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mfrac><mrow><mi>&#x2202;</mi><mi mathvariant="script">L</mi></mrow><mrow><mi>&#x2202;</mi><mover><mi>&#x3b8;</mi><mo stretchy="false" style="math-style:normal;math-depth:0;">&#x2d9;</mo></mover></mrow></mfrac><mo>=</mo><mfrac><mrow><mi>&#x2202;</mi><mi mathvariant="script">L</mi></mrow><mrow><mi>&#x2202;</mi><mi>&#x3b8;</mi></mrow></mfrac></mrow></math>
+        <h4>Med</h4>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="script">L</mi><mo>=</mo><mi>T</mi><mo>&#x2212;</mo><mi>U</mi></mrow></math>
+        <h4>Där 
+            <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>T</mi></math> 
+            är den kinesiska energin och 
+            <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>U</mi></math>
+            är den potentiella energin.
+        </h4>
+        <h4>I pendeln blir 
+            <math xmlns="http://www.w3.org/1998/Math/MathML"><mi mathvariant="script">L</mi></math>
+            :
+        </h4>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi mathvariant="script">L</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>m</mi><msup><mover><mi>s</mi><mo stretchy="false" style="math-style:normal;math-depth:0;">&#x2d9;</mo></mover><mn>2</mn></msup><mo>&#x2212;</mo><mi>m</mi><mi>g</mi><mi>r</mi><mo form="prefix" stretchy="false">(</mo><mn>1</mn><mo>&#x2212;</mo><mi>c</mi><mi>o</mi><mi>s</mi><mo form="prefix" stretchy="false">(</mo><mi>&#x3b8;</mi><mo form="postfix" stretchy="false">)</mo><mo form="postfix" stretchy="false">)</mo></mrow></math>
+        <h4>Där
+            <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover><mi>s</mi><mo stretchy="false" style="math-style:normal;math-depth:0;">&#x2d9;</mo></mover><mo>=</mo><mi>r</mi><mover><mi>&#x3b8;</mi><mo stretchy="false" style="math-style:normal;math-depth:0;">&#x2d9;</mo></mover></mrow></math>
+            precis som i Newton-fallet.
+        </h4>
+        <h4>Så då löser vi bara Euler-Lagrange:</h4>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mrow><mi>&#x2202;</mi><mi mathvariant="script">L</mi></mrow><mrow><mi>&#x2202;</mi><mi>&#x3b8;</mi></mrow></mfrac><mo>=</mo><mo>&#x2212;</mo><mi>m</mi><mi>g</mi><mi>r</mi><mo>&#xb7;</mo><mi>s</mi><mi>i</mi><mi>n</mi><mo form="prefix" stretchy="false">(</mo><mi>&#x3b8;</mi><mo form="postfix" stretchy="false">)</mo></mrow></math>
+        <br><br><br>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mfrac><mi>d</mi><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mfrac><mrow><mi>&#x2202;</mi><mi mathvariant="script">L</mi></mrow><mrow><mi>&#x2202;</mi><mover><mi>&#x3b8;</mi><mo stretchy="false" style="math-style:normal;math-depth:0;">&#x2d9;</mo></mover></mrow></mfrac><mo>=</mo><mfrac><mi>d</mi><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mi>m</mi><msup><mi>r</mi><mn>2</mn></msup><mover><mi>&#x3b8;</mi><mo stretchy="false" style="math-style:normal;math-depth:0;">&#x2d9;</mo></mover><mo>=</mo><mi>m</mi><msup><mi>r</mi><mn>2</mn></msup><mover><mi>&#x3b8;</mi><mo stretchy="false" style="math-style:normal;math-depth:0;">&#xa8;</mo></mover></mrow></math>
+        <h4>Nu sätter vi dom lika med varanda och får:</h4>
+        <math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mover><mi>&#x3b8;</mi><mo stretchy="false" style="math-style:normal;math-depth:0;">&#xa8;</mo></mover><mo>=</mo><mo>&#x2212;</mo><mfrac><mi>g</mi><mi>r</mi></mfrac><mo>&#xb7;</mo><mi>s</mi><mi>i</mi><mi>n</mi><mo form="prefix" stretchy="false">(</mo><mi>&#x3b8;</mi><mo form="postfix" stretchy="false">)</mo></mrow></math>
+        <h4>Samma som med Newton.
+            <br>Det finns många andra sätt att härleda pendeln men att formatera MathML är ett helvete så det får räcka där.
+            <br>Testa med Hamiltonisk mekanik om du känner dig uttråkad.
+            <br>Där är 
+            <math xmlns="http://www.w3.org/1998/Math/MathML"><mi mathvariant="script">H</mi><mo>=</mo><mi>T</mi><mo>+</mo><mi>U</mi></math>
+            så man räknar snarare på systemets totala energi.
+        </h4>
+        <img src="hamilton.png" width="200px">
+    </div>
+    
     <script src="pendulum.js"></script>
 </body>
