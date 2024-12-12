@@ -1,0 +1,29 @@
+data operations:
+    (arithmetic)
+add R1 R2 R3: R1 = R2 + R3
+sub R1 R2 R3: R1 = R2 - R3
+addi R1 R1 v: R1 = R2 + v
+mult R2 R3  : hi, lo = R2 * R3
+div R2 R3   : lo = R2/R3, hi = remainder
+    (logical)
+and
+or
+andi
+ori
+sll     shiftleftlogical
+srl     shiftrightlogical
+
+data transfer:
+lw      loadword
+sw      storeword
+lui     loadupperimmediate
+
+sequencing:
+beq     branchonequal
+bne     branchonnotequal
+slt     setonlessthan
+slti
+
+j v         : goto v    - jump
+jr R31      : goto R31  - jumpregister
+jal         ;           - jumpandlink
