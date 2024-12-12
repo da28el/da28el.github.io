@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>λ</title>
+    <link rel="icon" type="image/x-icon" href="./favicon.ico">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        :root {
+            --red: #ef233c;
+            --darkred: #c00424;
+            --platinum: #e5e5e5;
+            --black: #2b2d42;
+            --white: #fff;
+            --thumb: #edf2f4;
+            --green: #23ef71;
+            --darkgreen: #04c059;
+
+        }
+
+        * {
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+        }
+
+        body {
+            font: 16px / 24px "Rubik", sans-serif;
+            color: var(--black);
+            background: var(--platinum);
+            margin: 50px 0;
+        }
+
+        .container {
+            max-width: 800px;
+            padding: 0 15px;
+            margin: 0 auto;
+        }
+
+        .cards {
+            display: flex;
+            padding: 25px 0px;
+            list-style: none;
+            overflow-x: scroll;
+            scroll-snap-type: x mandatory;
+        }
+
+        .card {
+            display: flex;
+            flex-direction: column;
+            flex: 0 0 50%;
+            flex-basis: calc(100% - 10px);
+            padding: 5% 15% 10%;
+            margin-right: 40px;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,20%);
+            scroll-snap-align: center;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .card .card-link-wrapper {
+            margin-top: auto;
+        }
+
+        .cards::-webkit-scrollbar {
+            height: 12px;
+        }
+
+        .cards::-webkit-scrollbar-thumb,
+        .cards::-webkit-scrollbar-track {
+            border-radius: 90px;
+        }
+
+        .cards::-webkit-scrollbar-thumb {
+            background: var(--darkred);
+        }
+
+        .cards::-webkit-scrollbar-track {
+            background: var(--thumb);
+        }
+
+        .scroll-buttons {
+            position: absolute;
+            bottom: 10px;
+            transform: translateX(150%);
+            display: flex;
+            gap: 20px;
+        }
+
+        .scroll-button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 50px;
+            background: var(--red);
+            color: var(--white);
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .scroll-button:hover {
+            background: var(--darkred);
+        }
+
+        .code-container {
+            max-width: 800px;
+            padding: 10px 15px;
+            margin: 0 auto;
+            display: flex;
+        }
+
+        .function-definition {
+            background: var(--white);
+            border-radius: 10px;
+            border-color: var(--platinum);
+            margin: 0 auto;
+            padding: 10px;
+            resize: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,20%);
+            width: 70%;
+        }
+
+        .function-definition:focus {
+            outline: none;
+        }
+
+        .function-call {
+            display: flex;
+            flex-direction: column;
+            width: 30%;
+            padding: 0 5px;
+        }
+
+        .function-call-history {
+            background: var(--black);
+            color: var(--platinum);
+            border-radius: 10px;
+            margin: 0 0 4px;
+            padding: 10px;
+            resize: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,20%);
+            width: calc(100% - 5px);
+            height: auto;
+        }
+
+        .function-call-history:focus {
+            outline: none;
+        }
+
+        .function-call-history::-webkit-scrollbar {
+            height: 12px;
+        }
+
+        .function-call-history::-webkit-scrollbar-thumb,
+        .function-call-history::-webkit-scrollbar-track {
+            border-radius: 90px;
+        }
+
+        .function-call-history::-webkit-scrollbar-thumb {
+            background: var(--darkred);
+        }
+
+        .function-call-history::-webkit-scrollbar-track {
+            background: var(--thumb);
+        }
+
+        .function-call-input {
+            background: var(--black);
+            color: var(--platinum);
+            border-radius: 10px;
+            margin: 0 auto;
+            padding: 10px;
+            resize: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,20%);
+            width: calc(80% - 5px);
+        }
+
+        .function-call-input:focus {
+            outline: none;
+        }
+
+        .function-call-run {
+            padding: 10px 15px;
+            width: calc(20% - 5px);
+            /* border: none; */
+            border-color: var(--black);
+            border-style: solid;
+            border-radius: 10px;
+            background: var(--green);
+            color: var(--white);
+            font-size: 12px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,20%);
+            transition: background 0.3s;
+        }
+
+        .function-call-run:hover {
+            background: var(--darkgreen);
+        }
+
+        .red-button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 50px;
+            background: var(--red);
+            color: var(--white);
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .red-button:hover {
+            background: var(--darkred);
+        }
+
+        .spoiler {
+            display: inline;
+            margin-bottom: 2px;
+            width: auto;
+            background: var(--black);
+        }
+
+        .spoiler:hover {
+            background: var(--platinum);
+        }
+
+    </style>
+</head>
+<body>
+    <div id="HOME">
+        <a href="../homepage.html">
+            <img src="https://i.kym-cdn.com/entries/icons/original/000/000/142/feelsgoodman.png" width="40" height="20">
+        </a>
+    </div>
+    <div class="container">
+        <h2>λ-calculus</h2>
+        <ul class="cards">
+            <li class="card">
+                <div>
+                    <h3 class="card-title">λ-calculus</h3>
+                    <div class="card-content">
+                        Lambda-calculus (lambdakalkyl) är ett matematiskt system för att beskriva beräkningar.<br> 
+                        <br>
+                        Teorin går ut på att utföra operationer på speciella matematiska formler, så kallade λ-termer / λ-uttryck.<br>
+                        <br>
+                        λ-calculus skapades av Alonzo Church 1930 och ligger till grund för den funktionella-programmeringen.<br> 
+                        <br>
+                        λ-calculus kan ses som det minsta universella programmeringsspråket.<br>
+                    </div>
+                </div>
+                <div class="scroll-buttons">
+                    <button class="scroll-button backward">←</button>
+                    <button class="scroll-button forward">→</button>
+                </div>
+            </li>
+            <li class="card">
+                <div>
+                    <h3 class="card-title">λ-termer</h3>
+                    <div class="card-content">
+                        Det finns 3 olika former av λ-termer: <br>
+                        <ul>
+                            <li>Variabler: x, y, z</li>
+                            &emsp;Representerar en parameter.
+                            <li>Abstraktioner: λx.N</li>
+                            &emsp;Där N är en λ-term och punkten visar vart funktionskroppen börjar.<br>
+                            &emsp;T.ex: λx.x är en funktion som tar argumentet x och returnerar x.<br>
+                            &emsp;&emsp;&emsp;f(x) = x<br>
+                            <li>Applikation: N M</li>
+                            &emsp;Här kallar vi funktionen N med argumentet M<br>
+                            &emsp;&emsp;&emsp;N(M)<br>
+                        </ul>
+                    </div>
+                </div>
+                <div class="scroll-buttons">
+                    <button class="scroll-button backward">←</button>
+                    <button class="scroll-button forward">→</button>
+                </div>
+            </li>
+            <li class="card">
+                <div>
+                    <h3 class="card-title">Syntax-regler</h3>
+                    <div class="card-content">
+                        <ul>
+                            <li>Gruppering görs med hjälp av paranteser:</li>
+                            &emsp;(λx.x) ((λy.y) z)<br>
+                            <li>Abstraktioner är höger-associativa:</li>
+                            &emsp;λx.N M = λx.(N M) ≠ (λx.N) M<br>
+                            <li>Applikationer är vänster-associativa:</li>
+                            &emsp;A B C = (A B) C ≠ A (B C)<br>
+                        </ul>
+                    </div>
+                </div>
+                <div class="scroll-buttons">
+                    <button class="scroll-button backward">←</button>
+                    <button class="scroll-button forward">→</button>
+                </div>
+            </li>
+            <li class="card">
+                <div>
+                    <h3 class="card-title">Javascript</h3>
+                    <div class="card-content">
+                        Javascript är ett objektorienterat språk designat för att köras i webbläsare för att lägga till funktionalitet till webbsidor.<br>
+                        <br>
+                        Trots namnet <b>Java</b>script har språket i princip lika mycket gemensamt med <b>Java</b> som en <b>Mask</b> har med en <b>Mask</b>in.<br>
+                        <br>
+                        Hur som helst så stödjer Javascript lambda-funtioner vilket gör att man kan skriva lambda-calculus här i webbläsaren.
+                    </div>
+                </div>
+                <div class="scroll-buttons">
+                    <button class="scroll-button backward">←</button>
+                    <button class="scroll-button forward">→</button>
+                </div>
+            </li>
+            <li class="card">
+                <div>
+                    <h3 class="card-title">Vad är rutorna där nere?</h3>
+                    <div class="card-content">
+                        Jag har skrivit denna sida för att kunna definiera och köra λ-funtioner.<br>
+                        I den stora vita rutan definieras funktioner, som kan ses om du trycker på demo-knappen.<br>
+                        Den nedre mörka rutan är prompten, där kallas funktionerna.<br>
+                        Den övre mörka rutan är loggen, där hamnar outputen från prompten.<br>
+                        Koden körs med <b>ENTER</b> i prompten eller med den <b>gröna knappen</b>.<br>
+                        Börja med att trycka på den gröna knappen och kolla outputen i loggen.<br>
+                        Sen kan du testa att köra <b>ADD(2)(3)</b> i prompten och <b>CURRIED(10)</b><br>
+                        <br>
+                        <button class="red-button" onclick='
+                            codeDefinitions.value = `PRINT = () => "Hello, World!"\nADD = (a) => (b) => a + b\nCURRIED = ADD(5)`;
+                            codePrompt.value = "PRINT()";
+                        '>Tryck här för ett demo</button>
+                        <button class="red-button" onclick="
+                            codeDefinitions.value = '';
+                            codePrompt.value = '';
+                            codeLog.value = '';
+                        ">Tryck här när du testat färdigt</button>
+                    </div>
+                </div>
+                <div class="scroll-buttons">
+                    <button class="scroll-button backward">←</button>
+                    <button class="scroll-button forward">→</button>
+                </div>
+            </li>
+            <li class="card">
+                <div>
+                    <h3 class="card-title">Pil-notation</h3>
+                    <div class="card-content">
+                        En λ-funktion skrivs som sagt i λ-calculus som:<br>
+                        λ [argument] <b>.</b> [funktionskropp]&emsp;&emsp;Ex. λx<b>.</b>x<br>
+                        Vilket i Javascript skrivs som:<br>
+                        <b>(</b>argument<b>)</b> <b>=></b> funktionskropp&emsp;&emsp;Ex. 
+                        <b>(</b>x<b>)</b> <b>=></b> x<br>
+                        För att kunna använda vår funktion kan vi namnge den när vi skapar den:<br>
+                        A = (x) => x<br>
+                        Och vi använder den genom att köra <b>A</b> med ett värde (Applikation).<br>
+                        T.ex:&emsp;A(1)<br>
+                        <br>
+                        <button class="red-button" onclick="
+                            codeDefinitions.value += 'A = (a) => a\n';
+                            codePrompt.value = 'A(1)';
+                        ">Testa Själv</button>
+                    </div>
+                </div>
+                <div class="scroll-buttons">
+                    <button class="scroll-button backward">←</button>
+                    <button class="scroll-button forward">→</button>
+                </div>
+            </li>
+            <li class="card">
+                <div>
+                    <h3 class="card-title">Kombinatorer</h3>
+                    <div class="card-content">
+                        Det var väl inte så svårt?<br>
+                        <br>
+                        Nu är det dags att testa att implementera några olika kombinatorer för att se vad dom gör och hur dom fungerar.<br>
+                        <br>
+                        Vi börjar med att ta bort det förra exemplet:<br>
+                        <br>
+                        <button class="red-button" onclick="
+                            codeDefinitions.value = '';
+                            codePrompt.value = '';
+                            codeLog.value = '';
+                        ">Rensa</button>
+                    </div>
+                </div>
+                <div class="scroll-buttons">
+                    <button class="scroll-button backward">←</button>
+                    <button class="scroll-button forward">→</button>
+                </div>
+            </li>
+            <li class="card">
+                <div>
+                    <h3 class="card-title">Identitet</h3>
+                    <div class="card-content">
+                        Den lättaste kombinatorn är <b>Identitet</b> och vi beteckar den nu med stora i.<br>
+                        <br>
+                        Den skrivs i λ-calculus som:<br>
+                        I = λ a <b>.</b> a<br>
+                        Vilket betyder att den i Javascript skrivs som:<br>
+                        I = (a) => a<br>
+                        Testa att köra den med lite olika argument:<br>
+                        T.ex:&emsp;I(11), I(true), I("Hej"), I(I(17))<br>
+                        <br>
+                        <button class="red-button" onclick="
+                            codeDefinitions.value += 'I = (a) => a\n';
+                            codePrompt.value = 'I(11)';
+                        ">Testa Själv</button>
+                    </div>
+                </div>
+                <div class="scroll-buttons">
+                    <button class="scroll-button backward">←</button>
+                    <button class="scroll-button forward">→</button>
+                </div>
+            </li>
+            <li class="card">
+                <div>
+                    <h3 class="card-title">K-kombinatorn</h3>
+                    <div class="card-content">
+                        Den andra kombinatorn vi testar är lite svårare.<br>
+                        Den skrivs som:<br>
+                        <b>λ:</b> K = λ a <b>.</b> λ b <b>.</b> a &emsp;&emsp;<b>JS:</b> K = (a) => (b) => a<br>
+                        <br>
+                        Den tar två argument men returnerar bara det första.<br>
+                        Men vad kan det vara bra för?<br>
+                        <br>
+                        Ex:&emsp;K('a')('b'), K(true)(false)<br>
+                        <br>
+                        <button class="red-button" onclick="
+                            codeDefinitions.value += 'K = (a) => (b) => a\n';
+                            codePrompt.value = `K('a')('b')`;
+                        ">Testa Själv</button>
+                    </div>
+                </div>
+                <div class="scroll-buttons">
+                    <button class="scroll-button backward">←</button>
+                    <button class="scroll-button forward">→</button>
+                </div>
+            </li>
+            <li class="card">
+                <div>
+                    <h3 class="card-title">KI-kombinatorn</h3>
+                    <div class="card-content">
+                        Den tredje kombinatorn är en kombination av dom två tidigare.<br>
+                        Den skrivs som:<br>
+                        <b>λ:</b> KI = λ a <b>.</b> λ b <b>.</b> b &emsp;&emsp;<b>JS:</b> KI = K(I)<br>
+                        Alternativt:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;KI = (a) => (b) => b<br>
+                        <br>
+                        Nu ignorerar den det första argumentet och returnera det andra.<br>
+                        <br>
+                        Ex:&emsp;KI('a')('b'), KI(true)(false)<br>
+                        <br>
+                        <button class="red-button" onclick="
+                            codeDefinitions.value += 'KI = K(I)\n';
+                            codePrompt.value = `KI('a')('b')`;
+                        ">Testa Själv</button>
+                    </div>
+                </div>
+                <div class="scroll-buttons">
+                    <button class="scroll-button backward">←</button>
+                    <button class="scroll-button forward">→</button>
+                </div>
+            </li>
+            <li class="card">
+                <div>
+                    <h3 class="card-title">C-kombinatorn</h3>
+                    <div class="card-content">
+                        Den fjärde kombinatorn tar nu tre argument och skrivs som:<br>
+                        <b>λ:</b> C = λ f <b>.</b> λ a <b>.</b> λ b <b>.</b> f b a &emsp;&emsp;<b>JS:</b> C = (f) => (a) => (b) => f(b)(a)<br>
+                        <br>
+                        Vi tar en funktion och två argument och kallar funktionen med argumenten i omvänd ordning.<br>
+                        Ex:&emsp;C(K)('a')('b'), C(KI)('a')('b')<br>
+                        Kan du list ut vad som händer med C(K) och C(KI)?<br>
+                        Tjuvkika inte: 
+                        <div class="spoiler">C(K) = KI, C(KI) = K</div><br>
+                        <br>
+                        <button class="red-button" onclick="
+                            codeDefinitions.value += 'C = (f) => (a) => (b) => f(b)(a)\n';
+                            codePrompt.value = `C(K)('a')('b')`;
+                        ">Testa Själv</button>
+                    </div>
+                </div>
+                <div class="scroll-buttons">
+                    <button class="scroll-button backward">←</button>
+                    <button class="scroll-button forward">→</button>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="code-container">
+        <textarea class="function-definition" id="code-definitions" rows="18" spellcheck="false"></textarea>
+        <div class="function-call">
+            <textarea class="function-call-history" id="code-log" rows="17" readonly></textarea>
+            <div>
+                <input type="text" class="function-call-input" id="code-prompt" onkeydown="
+                    if (event.key == 'Enter') {
+                        eval(codeDefinitions.value);
+                        lastUserInstruction = codePrompt.value;
+                        codeLog.value += codePrompt.value + ' : ' + eval(codePrompt.value) + '\n';
+                        codePrompt.value = '';
+                        codeLog.scrollTop = codeLog.scrollHeight;
+                    }
+                    if (event.key == 'ArrowUp') {
+                        var newLastUserInstruction = codePrompt.value;
+                        codePrompt.value = lastUserInstruction;
+                        setTimeout(()=>{
+                            codePrompt.selectionStart = 10000;
+                            codePrompt.selectionEnd = 10000;
+                        }, 0);
+                        lastUserInstruction = newLastUserInstruction;
+                    }
+                " spellcheck="false">
+                <button class="function-call-run" onclick="
+                    eval(codeDefinitions.value);
+                    codeLog.value += codePrompt.value + ' : ' + eval(document.getElementById('code-prompt').value) + '\n';
+                    codePrompt.value = '';
+                    codeLog.scrollTop = codeLog.scrollHeight;
+                ">▶</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        var lastUserInstruction = "";
+        var codeLog = document.getElementById('code-log');
+        var codePrompt = document.getElementById('code-prompt');
+        var codeDefinitions = document.getElementById('code-definitions');
+        document.querySelectorAll('.scroll-button').forEach((button) => {
+            button.addEventListener('click', () => {
+                const card = button.closest('.card');
+                const cardsContainer = card.parentElement;
+                const cards = Array.from(cardsContainer.children);
+                const currentIndex = cards.indexOf(card);
+                const isNext = button.classList.contains('forward');
+                const targetIndex = isNext ? currentIndex + 1 : currentIndex - 1;
+                const targetCard = cards[targetIndex];
+
+                if (targetCard) {
+                    targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+                }
+            });
+        });
+    </script>
+    <style>
+        .controll{
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</body>
