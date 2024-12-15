@@ -15,7 +15,7 @@
             --thumb: #edf2f4;
             --green: #23ef71;
             --darkgreen: #04c059;
-
+            --blue: #239aef;
         }
 
         * {
@@ -261,15 +261,21 @@
                     <div class="card-content">
                         Det finns 3 olika former av λ-termer: <br>
                         <ul>
-                            <li>Variabler: x, y, z</li>
-                            &emsp;Representerar en parameter.
-                            <li>Abstraktioner: λx.N</li>
-                            &emsp;Där N är en λ-term och punkten visar vart funktionskroppen börjar.<br>
-                            &emsp;T.ex: λx.x är en funktion som tar argumentet x och returnerar x.<br>
-                            &emsp;&emsp;&emsp;f(x) = x<br>
-                            <li>Applikation: N M</li>
-                            &emsp;Här kallar vi funktionen N med argumentet M<br>
-                            &emsp;&emsp;&emsp;N(M)<br>
+                            <div style="border-color: var(--red); border-style: dashed; padding-left: 20px;">
+                                <li>Variabler: x, y, z</li>
+                                &emsp;Representerar en parameter.
+                            </div>
+                            <div style="border-color: var(--green); border-style: dashed; padding-left: 20px;">
+                                <li>Abstraktioner: λx<b>.</b>N</li>
+                                &emsp;Där N är en λ-term och punkten visar vart funktionskroppen börjar.<br>
+                                &emsp;T.ex: λx<b>.</b>x är en funktion som tar argumentet x och returnerar x.<br>
+                                &emsp;&emsp;&emsp;f(x) = x<br>
+                            </div>
+                            <div style="border-color: var(--blue); border-style: dashed; padding-left: 20px;">
+                                <li>Applikation: N M</li>
+                                &emsp;Här kallar vi funktionen N med argumentet M. N och M är λ-termer.<br>
+                                &emsp;&emsp;&emsp;N(M)<br>
+                            </div>
                         </ul>
                     </div>
                 </div>
@@ -297,6 +303,7 @@
                     <button class="scroll-button forward">→</button>
                 </div>
             </li>
+            <!-- REDUKTIONER -->
             <li class="card">
                 <div>
                     <h3 class="card-title">Javascript</h3>
@@ -373,6 +380,8 @@
                         Det var väl inte så svårt?<br>
                         <br>
                         Nu är det dags att testa att implementera några olika kombinatorer för att se vad dom gör och hur dom fungerar.<br>
+                        <br>
+                        En kombinator är bara en lambda-term utan fria variabler.
                         <br>
                         Vi börjar med att ta bort det förra exemplet:<br>
                         <br>
@@ -468,10 +477,33 @@
                         <b>λ:</b> C = λ f <b>.</b> λ a <b>.</b> λ b <b>.</b> f b a &emsp;&emsp;<b>JS:</b> C = (f) => (a) => (b) => f(b)(a)<br>
                         <br>
                         Vi tar en funktion och två argument och kallar funktionen med argumenten i omvänd ordning.<br>
-                        Ex:&emsp;C(K)('a')('b'), C(KI)('a')('b')<br>
+                        Ex:&emsp;C(K)('a')('b'), C(KI)('a')('b'), C(C(K))('a')('b')<br>
                         Kan du list ut vad som händer med C(K) och C(KI)?<br>
                         Tjuvkika inte: 
-                        <div class="spoiler">C(K) = KI, C(KI) = K</div><br>
+                        <div class="spoiler">C(K) = KI, C(KI) = K, Känner du igen detta beteende?</div><br>
+                        <br>
+                        <button class="red-button" onclick="
+                            codeDefinitions.value += 'C = (f) => (a) => (b) => f(b)(a)\n';
+                            codePrompt.value = `C(K)('a')('b')`;
+                        ">Testa Själv</button>
+                    </div>
+                </div>
+                <div class="scroll-buttons">
+                    <button class="scroll-button backward">←</button>
+                    <button class="scroll-button forward">→</button>
+                </div>
+            </li>
+            <li class="card">
+                <div>
+                    <h3 class="card-title">M-kombinatorn</h3>
+                    <div class="card-content">
+                        Den femte kombinatorn är lite esoterisk:<br>
+                        <b>λ:</b> M = λ f <b>.</b> f f &emsp;&emsp;<b>JS:</b> M = (f) => f(f)<br>
+                        <br>
+                        Denna är alltså "själv-applikation". Vi tar en funktion och kallar argumentet med argumentet.
+                        Den är svårare att testa, M(M) t.ex. blir M(M(M(M(...)))) alltså en oändlig rekursion som såklart misslyckas praktiskt när callstacken fylls upp.<br>
+                        Ex:&emsp;M(I)('a'), M(K)('a')('b')('c'), M(KI)('a')<br>
+                        <div class="spoiler">M(I) = I(I) = I, M(K) = λabc.b, M(KI) = I</div>
                         <br>
                         <button class="red-button" onclick="
                             codeDefinitions.value += 'C = (f) => (a) => (b) => f(b)(a)\n';
