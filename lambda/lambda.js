@@ -68,6 +68,7 @@ console.log('SND (V 2 5)', SND(V(2)(5)));
 
 const N0 = f => a => a;
 const N1 = f => a => f(a);
+const N2 = f => a => f(f(a));
 
 const SUCC = n => f => f(n(f))
 
