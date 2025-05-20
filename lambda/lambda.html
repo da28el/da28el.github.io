@@ -224,7 +224,8 @@
         }
 
         .spoiler:hover {
-            background: var(--platinum);
+            /* background: var(--platinum); */
+            color: var(--white);
         }
 
     </style>
@@ -315,6 +316,7 @@
                         På samma sätt:<br>
                         λx <b>.</b> z λy <b>.</b> λz <b>.</b> x y<br>
                         Där <b>x</b> och <b>y</b> är bundna variabler och <b>z</b> än en gång är en fri variabel eftersom den förekommer innan sitt funktionshuvud.<br>
+                        I λ-calculus är uttryck med fria variabler tillåtna men vi kommer inte (kunna) använda dessa här.<br>
                     </div>
                 </div>
                 <div class="scroll-buttons">
@@ -358,9 +360,9 @@
                     <div class="card-content">
                         Javascript är ett objektorienterat språk designat för att köras i webbläsare för att lägga till funktionalitet till webbsidor.<br>
                         <br>
-                        Trots namnet <b>Java</b>script har språket i princip lika mycket gemensamt med <b>Java</b> som en <b>Mask</b> har med en <b>Mask</b>in.<br>
+                        Javascript stödjer lambda-funtioner vilket gör att man kan skriva lambda-calculus här i webbläsaren.<br>
                         <br>
-                        Hur som helst så stödjer Javascript lambda-funtioner vilket gör att man kan skriva lambda-calculus här i webbläsaren.
+                        Det enda undantaget är att fria variabler inte stöds.<br>
                     </div>
                 </div>
                 <div class="scroll-buttons">
@@ -403,12 +405,12 @@
                         En λ-funktion skrivs som sagt i λ-calculus som:<br>
                         λ [argument] <b>.</b> [funktionskropp]&emsp;&emsp;Ex. λx<b>.</b>x<br>
                         Vilket i Javascript skrivs som:<br>
-                        <b>(</b>argument<b>)</b> <b>=></b> funktionskropp&emsp;&emsp;Ex. 
-                        <b>(</b>x<b>)</b> <b>=></b> x<br>
+                        <b>(argument) => funktionskropp</b>&emsp;&emsp;Ex. 
+                        <b>(x)=> x</b><br>
                         För att kunna använda vår funktion kan vi namnge den när vi skapar den:<br>
-                        A = (x) => x<br>
+                        <b>A = (x) => x</b><br>
                         Och vi använder den genom att köra <b>A</b> med ett värde (Applikation).<br>
-                        T.ex:&emsp;A(1)<br>
+                        T.ex:&emsp;<b>A(1)</b><br>
                         <br>
                         <button class="red-button" onclick="
                             codeDefinitions.value += 'A = (a) => a\n';
@@ -454,9 +456,9 @@
                         Den skrivs i λ-calculus som:<br>
                         I = λ a <b>.</b> a<br>
                         Vilket betyder att den i Javascript skrivs som:<br>
-                        I = (a) => a<br>
+                        <b>I = (a) => a</b><br>
                         Testa att köra den med lite olika argument:<br>
-                        T.ex:&emsp;I(11), I(true), I("Hej"), I(I(17))<br>
+                        T.ex:&emsp;<b>I(11)</b>, <b>I(true)</b>, <b>I("Hej")</b>, <b>I(I(17))</b><br>
                         <br>
                         <button class="red-button" onclick="
                             codeDefinitions.value += 'I = (a) => a\n';
@@ -475,12 +477,12 @@
                     <div class="card-content">
                         Den andra kombinatorn vi testar är lite svårare.<br>
                         Den skrivs som:<br>
-                        <b>λ:</b> K = λ a <b>.</b> λ b <b>.</b> a &emsp;&emsp;<b>JS:</b> K = (a) => (b) => a<br>
+                        <b>λ:</b> K = λ a <b>.</b> λ b <b>.</b> a &emsp;&emsp;<b>JS: K = (a) => (b) => a</b><br>
                         <br>
                         Den tar två argument men returnerar bara det första.<br>
                         Men vad kan det vara bra för?<br>
                         <br>
-                        Ex:&emsp;K('a')('b'), K(true)(false)<br>
+                        Ex:&emsp;<b>K('a')('b'), K(true)(false)</b><br>
                         <br>
                         <button class="red-button" onclick="
                             codeDefinitions.value += 'K = (a) => (b) => a\n';
@@ -499,12 +501,12 @@
                     <div class="card-content">
                         Den tredje kombinatorn är en kombination av dom två tidigare.<br>
                         Den skrivs som:<br>
-                        <b>λ:</b> KI = λ a <b>.</b> λ b <b>.</b> b &emsp;&emsp;<b>JS:</b> KI = K(I)<br>
-                        Alternativt:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;KI = (a) => (b) => b<br>
+                        <b>λ:</b> KI = λ a <b>.</b> λ b <b>.</b> b &emsp;&emsp;<b>JS: KI = K(I)</b><br>
+                        Alternativt:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;<b>KI = (a) => (b) => b</b><br>
                         <br>
                         Nu ignorerar den det första argumentet och returnera det andra.<br>
                         <br>
-                        Ex:&emsp;KI('a')('b'), KI(true)(false)<br>
+                        Ex:&emsp;<b>KI('a')('b'), KI(true)(false)</b><br>
                         <br>
                         <button class="red-button" onclick="
                             codeDefinitions.value += 'KI = K(I)\n';
@@ -522,13 +524,13 @@
                     <h3 class="card-title">C-kombinatorn</h3>
                     <div class="card-content">
                         Den fjärde kombinatorn tar nu tre argument och skrivs som:<br>
-                        <b>λ:</b> C = λ f <b>.</b> λ a <b>.</b> λ b <b>.</b> f b a &emsp;&emsp;<b>JS:</b> C = (f) => (a) => (b) => f(b)(a)<br>
+                        <b>λ:</b> C = λ f <b>.</b> λ a <b>.</b> λ b <b>.</b> f b a &emsp;&emsp;<b>JS: C = (f) => (a) => (b) => f(b)(a)</b><br>
                         <br>
                         Vi tar en funktion och två argument och kallar funktionen med argumenten i omvänd ordning.<br>
-                        Ex:&emsp;C(K)('a')('b'), C(KI)('a')('b'), C(C(K))('a')('b')<br>
+                        Ex:&emsp;<b>C(K)('a')('b'), C(KI)('a')('b'), C(C(K))('a')('b')</b><br>
                         Kan du list ut vad som händer med C(K) och C(KI)?<br>
                         Tjuvkika inte: 
-                        <div class="spoiler">C(K) = KI, C(KI) = K, Känner du igen detta beteende?</div><br>
+                        <div class="spoiler"><b>C(K) = KI</b>, <b>C(KI) = K</b>, Känner du igen detta beteende?</div><br>
                         <br>
                         <button class="red-button" onclick="
                             codeDefinitions.value += 'C = (f) => (a) => (b) => f(b)(a)\n';
@@ -546,11 +548,11 @@
                     <h3 class="card-title">M-kombinatorn</h3>
                     <div class="card-content">
                         Den femte kombinatorn är lite esoterisk:<br>
-                        <b>λ:</b> M = λ f <b>.</b> f f &emsp;&emsp;<b>JS:</b> M = (f) => f(f)<br>
+                        <b>λ:</b> M = λ f <b>.</b> f f &emsp;&emsp;<b>JS: M = (f) => f(f)</b><br>
                         <br>
                         Denna är alltså "själv-applikation". Vi tar en funktion och kallar argumentet med argumentet.
                         Den är svårare att testa, M(M) t.ex. blir M(M(M(M(...)))) alltså en oändlig rekursion som såklart misslyckas praktiskt när callstacken fylls upp.<br>
-                        Ex:&emsp;M(I)('a'), M(K)('a')('b')('c'), M(KI)('a')<br>
+                        Ex:&emsp;<b>M(I)('a')</b>, <b>M(K)('a')('b')('c')</b>, <b>M(KI)('a')</b><br>
                         <div class="spoiler">M(I) = I(I) = I, M(K) = λabc.b, M(KI) = I</div>
                         <br>
                         <button class="red-button" onclick="
@@ -619,7 +621,7 @@
                         <br>
                         <button class="red-button" onclick="
                             codeDefinitions.value += `IF = (a) => I(a)('sant')('falskt')\nOR = M\nAND = (a) => (b) => I(a)(b)(FALSE)\n`;
-                            codePrompt.value = `IF(AND(NOT(FALSE))(OR(NOT(TRUE))(TRUE)))`;
+                            codePrompt.value = 'IF(AND(NOT(FALSE))(OR(NOT(TRUE))(TRUE)))';
                         ">Testa</button>
                     </div>
                 </div>
@@ -638,11 +640,12 @@
                         <b>NAND = (a) => (b) => NOT(AND(a)(b))</b><br>
                         <b>NOR = <div class="spoiler">(a) => (b) => NOT(OR(a)(b))</div></b><br>
                         <b>XOR = (a) => (b) => OR(AND(a)(NOT(b)))(AND(NOT(a))(b))</b><br>
+                        <b>&emsp;&ensp;&emsp;= (a) => (b) => I(a)(NOT(b))(b)</b><br>
                         <b>XNOR = <div class="spoiler">(a) => (b) => NOT(XOR(a)(b))</div></b><br>
                         <br>
                         <button class="red-button" onclick="
-                            codeDefinitions.value += 'OR = M\nAND = (a) => (b) => IF(a)(b)(FALSE)\n';
-                            codePrompt.value = `IF(AND(NOT(FALSE))(OR(NOT(TRUE))(TRUE)))('sant')('falskt')`;
+                            codeDefinitions.value += 'NAND = (a) => (b) => NOT(AND(a)(b))\nNOR = (a) => (b) => NOT(OR(a)(b))\nXOR = (a) => (b) => I(a)(NOT(b))(b)\nXNOR = (a) => (b) => NOT(XOR(a)(b))\n';
+                            codePrompt.value = 'IF(XNOR(TRUE)(FALSE))';
                         ">Testa</button>
                     </div>
                 </div>
@@ -651,14 +654,91 @@
                     <button class="scroll-button forward">→</button>
                 </div>
             </li>
-            <!-- 
-                TRUE = K
-                FALSE = KI
-                NOT = C
-                IF = I
-                AND = (a) => (b) => IF(a)(b)(FALSE)
-                OR = M
-            -->
+            <li class="card">
+                <div>
+                    <h3 class="card-title">Boolesk logik 4</h3>
+                    <div class="card-content">
+                        I boolesk algebra behöver vi egentligen bara <b>NAND</b> för att kunna utföra alla booleska operationer.<br>
+                        <b>
+                        NAND = (a) => (b) => a(b)(FALSE)(FALSE)(TRUE)<br>
+                        (a) => NAND(a)(a) = NOT(a)<br>
+                        (a) => (b) => NOT(NAND(a)(b)) = AND(a)(b)<br>
+                        (a) => (b) => NAND(NOT(a))(NOT(b)) = OR(a)(b)</b> (DeMorgan)<br>
+                        osv. Testa att implementera och köra dem om du känner för det.<br>
+                        Tryck sen på <b>börja om</b>-knappen innan du går vidare.<br>
+                        <br>
+                        <button class="red-button" onclick="
+                            codeDefinitions.value = `TRUE = (a) => (b) => a\nFALSE = (a) => (b) => b\nIF = (a) => a('sant')('falskt')\n\nNAND = (a) => (b) => a(b)(FALSE)(FALSE)(TRUE)\nNOT = (a) => NAND(a)(a)\nAND = (a) => (b) => NOT(NAND(a)(b))\nOR = (a) => (b) => NAND(NOT(a))(NOT(b))\n`;
+                            codePrompt.value = 'IF(OR(TRUE)(AND(TRUE)(FALSE)))';
+                        ">Om du vill testa först</button>
+                        <button class="red-button" onclick="
+                            codeDefinitions.value = '';
+                            codePrompt.value = '';
+                            codeLog.value = '';
+                        ">Annars börjar vi om från scratch</button>
+                    </div>
+                </div>
+                <div class="scroll-buttons">
+                    <button class="scroll-button backward">←</button>
+                    <button class="scroll-button forward">→</button>
+                </div>
+            </li>
+            <li class="card">
+                <div>
+                    <h3 class="card-title">B C K W</h3>
+                    <div class="card-content">
+                        Vi såg nyss att bara <b>NAND</b> kan genera all boolesk algebra.<br>
+                        Haskell Curry listade ut att något liknande gällde för λ-calculus med.<br>
+                        Hans system bestod av:<br>
+                        <b>
+                            B = (x) => (y) => (z) => x(y(z))<br>
+                            C = (x) => (y) => (z) => x(z)(y)<br>
+                            K = (x) => (y) => x<br>
+                            W = (x) => (y) => x(y)(y)<br>
+                        </b>
+                        Genom att kombinera dessa kan vi generera <b>ALLA</b> möjliga λ-termer.<br>
+                        <b>I = W(K), KI = K(W(K)) = B(K)(W)(K) och M = W(W(K)) = B(W)(W)(K)</b><br>
+                        <button class="red-button" onclick="
+                        codeDefinitions.value = `B = (x) => (y) => (z) => x(y(z))\nC = (x) => (y) => (z) => x(z)(y)\nK = (x) => (y) => x\nW = (x) => (y) => x(y)(y)\n\nI = W(K)\nKI = B(K)(W)(K)\nM = B(W)(W)(K)\n`;
+                            codePrompt.value = `M(KI)('a')`;
+                        ">Testa</button>
+                    </div>
+                </div>
+                <div class="scroll-buttons">
+                    <button class="scroll-button backward">←</button>
+                    <button class="scroll-button forward">→</button>
+                </div>
+            </li>
+            <li class="card">
+                <div>
+                    <h3 class="card-title">S K I</h3>
+                    <div class="card-content">
+                        Vi nöjer oss inte där, vi kan korta ner systemet ännu mer!<br>
+                        Genom att endast definiera:<br>
+                        <b>
+                            S = (x) => (y) => (z) => x(z)(y(z))<br>
+                            K = (x) => (y) => x<br>
+                            I = (x) => x<br>
+                        </b>
+                        Med dessa kan vi skapa:<br>
+                        <b>
+                            KI = K(I) &emsp;&emsp;&emsp;&ensp;&nbsp;
+                            M = S(I)(I)<br>
+                            B = S(K(S))(K) &emsp;
+                            C = S(S(K(S(K(S))(K)))(S))(K(K))<br>
+                            W = S(S)(S(K))<br>
+                        </b>
+                        <button class="red-button" onclick="
+                        codeDefinitions.value = `B = (x) => (y) => (z) => x(y(z))\nC = (x) => (y) => (z) => x(z)(y)\nK = (x) => (y) => x\nW = (x) => (y) => x(y)(y)\n\nI = W(K)\nKI = B(K)(W)(K)\nM = B(W)(W)(K)\n`;
+                            codePrompt.value = `M(KI)('a')`;
+                        ">Testa</button>
+                    </div>
+                </div>
+                <div class="scroll-buttons">
+                    <button class="scroll-button backward">←</button>
+                    <button class="scroll-button forward">→</button>
+                </div>
+            </li>
         </ul>
     </div>
     <div class="code-container">

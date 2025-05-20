@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Polar</title>
+        <link rel="stylesheet" href="../style.css">
+    </head>
+    <body>
+        <div id="HOME">
+            <a href="../homepage.html">
+                <img src="https://i.kym-cdn.com/entries/icons/original/000/000/142/feelsgoodman.png" width="40" height="20">
+            </a>
+        </div>
+        <h2>r(θ) = cos(n/d ⨯ θ)</h2>
+        <canvas width="720" height="720" id="path">:(</canvas>
+        <canvas width="720" height="720" id="trace">:(</canvas>
+        <script src="polar.js"></script>
+    </body>
+    <style>
+        body {
+            background-color: #000000;
+        }
+        h2 {
+            font-family: 'Courier New', Courier, monospace;
+            color: #ffffff;
+        }
+        canvas {
+            position: absolute;
+            left: calc(50% - 360px);
+        };
+    </style>
+</html>
