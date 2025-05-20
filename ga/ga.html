@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GA</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <div id="HOME">
+        <a href="../homepage.html">
+            <img src="https://i.kym-cdn.com/entries/icons/original/000/000/142/feelsgoodman.png" width="40" height="20">
+        </a>
+    </div>
+    <h2>Geometrisk Algebra</h2>
+    <div class="control">
+        <button id="button-mv" disabled>Multivektorer</button>
+        <button id="button-rot">Rotationer</button>
+        <button id="button-dim">Andra Dimensioner</button>
+    </div>
+    <canvas width="480" height="480" class="img" id="ga200">:(</canvas>
+    <div id="page-mv">
+        <table class="control">
+            <tr>
+                <td><input type="number" placeholder="1" id="e0" step="0.5"></td>
+                <td><input type="number" placeholder="e1" id="e1" step="0.5"></td>
+                <td><input type="number" placeholder="e2" id="e2" step="0.5"></td>
+                <td><input type="number" placeholder="e12" id="e12" step="0.5"></td>
+            </tr>
+        </table>
+        <h1>Okej kolla, vektorer är konstiga</h1>
+        <h3>ibland skrivs dom som (x, y, z) och ibland som x*î + y*ĵ + z*k̂<br>
+            Här kan vi anta att båda notationerna är ekvivalenta, 
+            två sätt att skriva samma sak, inte så konstigt.</h3>
+        <h3>Det som däremot är konstigt är att vi inte kan multiplicera vektorer... <br>
+            Skalärer? såklart <br>
+            imaginära tal? visst <br>
+            matriser? kör hårt <br>
+            vektorer? nja inte riktigt...
+        </h3>
+        <h3>Big Math har pushat propaganda om att skalär- och kryssprodukten är lösningen på problemet.<br>
+            Men skalärprodukten ger oss bara en skalär och kryssprodukten är bara definierad i 3D.</h3>
+        <h1>Ibland måste man göra saker svårare för att det ska bli lättare</h1>
+        <h3>Med distributiva lagen som verktyg kan vi väl testa att multiplicera två vektorer?</h3>
+        <h2>(x₁*î + y₁*ĵ)(x₂*î + y₂*ĵ) = x₁x₂îî + x₁y₂îĵ + y₁x₂ĵî + y₁y₂ĵĵ</h2>
+        <h3>Om vi säger at îî = ĵĵ = 1 och îĵ = ĵî = 0 blir resultatet: x₁x₂+y₁y₂ vilket är skalärprodukten.</h3>
+        <h3>Men vi kan lika gärna säga att îî = ĵĵ = 0 och îĵ = -ĵî = 1 (antikommutativ) vilket ger oss: x₁y₂-x₂y₁<br>
+            vilket är z-komponenten av kryssprodukten aka pseudokryssprodukten i 2D.</h3>
+        <h3>Så reglerna för basvektorerna ändras baserat på räkneoperatorn?<br>
+            ta ∇ · (∇⨯A) = 0 som exempel. I samma ekvation har använder vi olika regler för basvektorerna.</h3>
+        <h3>Detta är ologiskt. Om vi istället behåller basvektorerna men med den antikommutativa regeln:<br>
+            (x₁*î + y₁*ĵ)(x₂*î + y₂*ĵ) = x₁x₂îî + y₁y₂ĵĵ + (x₁y₂ - y₁x₂)îĵ<br>
+            (x₂*î + y₂*ĵ)(x₁*î + y₁*ĵ) = x₁x₂îî + y₁y₂ĵĵ - (x₁y₂ - y₁x₂)îĵ</h3>
+        <h3>Här ser vi att produkten av två vektorer består av en kommutativ del (skalärprodukten) så vi definierar îî = ĵĵ = 1<br>
+            och en antikommutativ del (pseudokryssprodukten) îĵ = -ĵî</h3>
+        <h3>Då skalärprodukten är definierad i ℝⁿ kan vi behålla den notationen. Men vi kallar den för innre-produkten.<br>
+            kryssprodukten är däremot bara definierad i ℝ³ så vi kallar denna antikommutativa del för yttre-produkt och noterar denna med "∧"</h3>
+        <h3>Då har vi alltså: V₁V₂ = V₁ · V₂ + V₁ ∧ V₂<br>
+            vilket ger oss en skalär adderad med en îĵ-komponent</h3>
+        <h3>Vi har även: V₂V₁ = V₂ · V₁ + V₂ ∧ V₁ = V₁ · V₂ + V₁ ∧ V₂<br>
+            Vilket leder till: V₁ · V₂ = ½(V₁V₂ + V₂V₁)<br>
+            Samt: V₁ ∧ V₂ = ½(V₁V₂ - V₂V₁)</h3>
+        <h3>Produkten av två reella tal är också ett reellt tal, på samma sätt är produkten av två imaginära tal även ett imaginärt tal.<br>
+            Därför säger vi nu att produkten av två vektorer är en vektor.<br>
+            Men för att inte blanda ihop våra nya bättre vektorer med dom gamla tråkiga kallar vi dessa för <i>multivektorer</i>, ok?<br>
+            Vi kallar produkten av multivektorer för den <i>geometriska produkten</i><br>
+            Alltså kan vi säga att V = a + b*î + c*ĵ + d*îĵ där a, b, c, d ∈ ℝ</h3>
+        <h1>Men vad fan är en îĵ-komponent? </h1>
+        <h3>îĵ kallas en bivektor och kan ses som en orienterad (pga. antikommutativ) area. Orienteringen följer högerhandsregeln likt kryssprodukten.</h3>
+        <h3>Här i 2D kallas îĵ även för pseudoskalären, i 3D blir îĵk̂ pseudoskalären.</h3>
+        <h3>En ny notation vi kan införa är î = e₁, ĵ = e₂ vilket ger îĵ = e₁e₂ = e₁₂</h3>
+        <h3>Nu kan vi se att en bas e₁₂₁ = e₁e₂e₁ = -e₁e₁e₂ (antikommutativ) = -e₂ (eₙeₙ = 1)</h3>
+        <h3>Så vad händer om vi kvadrerar e₁? e₁ * e₁ = e₁₁ = 1. Inget konstigt här, samma gäller för e₂.<br>
+            Skalären då? a*a = a², fortfarande en skalär, vad annars?<br>
+            MEN! Kolla vad som händer om vi kvadrerar e₁₂ : e₁₂*e₁₂ = e₁e₂e₁e₂ = -e₂e₁e₁e₂ = -e₂e₂ = -1<br>
+            Vi får alltså -1. Fattar du vad det innebär? (e₁₂)² = -1 => e₁₂ = √-1</h3>
+        <h3>Om vi tar en multivektor V₁ = a₁ + 0*e₁ + 0*e₂ + b₁*e₁₂<br>
+            och en till multivektor V₂ = a₂ + 0*e₁ + 0*e₂ + b₂*e₁₂ och multiplicerar dessa:<br>
+            V₁V₂ = (a₁ + b₁*e₁₂)(a₂ + b₂*e₁₂) = a₁a₂ - b₁b₂ + (a₁b₂ + b₁a₂)e₁₂<br>
+            Om vi här byter ut e₁₂ mot 𝑖 får vi formeln för multiplikation av komplexa tal.</h3>
+        <h3>En multivektor i 2D består alltså av en vanlig vektor och ett imaginärt tal.</h3>
+        <h1>Men kan vi utnyttja detta?</h1>
+        <h3>Högst upp på sidan kan du testa att rita multivektorer,<br>
+            jag har inte kommit på något bra sätt att rita den skalära delen utan att använda en extra dimension.</h3>
+        <h3>När du har lekt klart kan du byta till sidan "Rotationer" med knappen högst upp för att fortsätta.</h3>
+    </div>
+    <div id="page-rot" style="display: none;">
+        <div class="control" id="slider-rot">
+            <label>θ:</label>
+            <input id="theta" type="range" min="0" max="6.28" value="0" step="0.001">
+        </div>
+        <h1>Så vi har vektorer tillsammans med komplexa tal, vad gör vi med det?</h1>
+        <h3>Om vi har ett komplext tal z = a + b𝑖 och multiplicerar det med 𝑖 får vi:<br>
+            z𝑖 = a𝑖 - b, dvs. en rotation moturs med 90°</h3>
+        <h3>I vårat fall har vi e₁₂ istället för 𝑖. så vad blir Ve₁₂?<br>
+            För enkelhetens skull säger vi att multivektorn V bara har e₁- och e₂-komponenter.<br>
+            Ve₁₂ = (a*e₁ + b*e₂)*e₁₂ = a*e₂ - b*e₁<br>
+            Nämen! Vektorn blev ju roterad 90° moturs precis som i fallet med komplexa tal.</h3>
+        <h3>Men multiplikation av multivektorer är ju antikommutativ? Så vad blir e₁₂V?<br>
+            e₁₂V = e₁₂*(a*e₁ + b*e₂) = -a*e₂ + b*e₁<br>
+            Alltså en rotation 90° medurs!</h3>
+        <h3>Coolt vi kan rotera multivektorer med 90°. Men det vore ju praktiskt att kunna rotera med en valfri vinkel.<br>
+            I det komplexa fallet multiplicerar vi z med exp(𝑖θ). Kan vi inte testa det fast med multivektorer?</h3>
+        <h3>V*exp(θ*e₁₂)<br>
+            Sakta i backarna... hur beräknar vi exp(θ*e₁₂)?<br>
+            Eftersom e₁₂ = √-1 borde vi ju helt enkelt kunna använda Eulers formel. (Kan enkelt härledas likt eulers formel)<br>
+            exp(θ*e₁₂) = cos(θ) + sin(θ)e₁₂</h3>
+        <h3>Nu kan vi beräkna V*exp(θ*e₁₂)<br>
+            V*exp(θ*e₁₂) = (a*e₁ + b*e₂)(cos(θ) + sin(θ)e₁₂) = a*cos(θ)*e₁ + a*sin(θ)*e₂ + b*cos(θ)*e₂ - b*sin(θ)e₁<br>
+            = (a*cos(θ) - b*sin(θ))*e₁ + (a*sin(θ) + b*cos(θ))*e₂</h3>
+        <h3>Kolla nu när vi ställer upp detta uttryck på matrisform:</h3>
+        <h3>
+            <table style="margin: 0px auto;">
+                <tr><td>cos(θ)</td><td>-sin(θ)</td></tr>
+                <tr><td>sin(θ)</td><td>cos(θ)</td></tr>
+            </table>
+        </h3>
+        <h3>Och där trillade rotationsmatrisen för ℝ² ut.</h3>
+        <h3>Precis som innan blir exp(θ*e₁₂)*V en rotation medurs istället.</h3>
+    </div>
+    <div id="page-dim" style="display: none;">
+        <h1>Olika signaturer</h1>
+        <h3>Hittills har vi bara kollat på ℝ₂₀₀<br>
+            ℝ betyder att vi använder reella tal, vad annars?<br>
+            Sen har vi 3 tal p, q, r, vilket förklarar hur reglerna för baserna fungerar.<br>
+            Vi har kollat på ℝ₂₀₀ som sagt, alltså p = 2, q = r = 0. Det dessa betyder är:<br>
+            p: hur många baser som resulterar i 1 när de kvadreras, ex. e₁₁ = 1, vi har använt 2: e₁ och e₂.<br>
+            q: hur många baser som kvadreras till -1<br>
+            r: hur många baser som kvadreras till 0</h3>
+        <h3>Med hjälp av dessa kan vi definiera olika algebror t.ex:<br>
+            Komplexa tal: ℝ₀₁₀<br>
+            Hyperboliska tal: ℝ₁₀₀<br>
+            duala tal: ℝ₀₀₁<br>
+            ℝ₂₀₀: som vi kollat på<br>
+            ℝ₃₀₀: 3D motsvarigheten osv.</h3>
+        <h3>Det underlättar att få se ett Cayley-diagram tex för ℝ₂₀₀:</h3>
+        <h3>
+            <table style="margin: 0px auto; border: 1px black; background-color: aliceblue;">
+                <tr><td>1</td><td>e₁</td><td>e₂</td><td>e₁₂</td></tr>
+                <tr><td>e₁</td><td>1</td><td>e₁₂</td><td>e₂</td></tr>
+                <tr><td>e₂</td><td>-e₁₂</td><td>1</td><td>-e₁</td></tr>
+                <tr><td>e₁₂</td><td>-e₂</td><td>e₁</td><td>-1</td></tr>
+            </table>
+        </h3>
+        <h3>Från diagrammet kan man lätt ta fram den geometriska produkten för olika algebror:</h3>
+        <h3>
+            <table style="margin: 0px auto;">
+                <tr>
+                    <td><input type="number" placeholder="1" id="e0-1-dim" step="0.5"></td>
+                    <td><input type="number" placeholder="e1" id="e1-1-dim" step="0.5"></td>
+                    <td><input type="number" placeholder="e2" id="e2-1-dim" step="0.5"></td>
+                    <td><input type="number" placeholder="e12" id="e12-1-dim" step="0.5"></td>
+                </tr>
+                <tr>
+                    <td><input type="number" placeholder="1" id="e0-2-dim" step="0.5"></td>
+                    <td><input type="number" placeholder="e1" id="e1-2-dim" step="0.5"></td>
+                    <td><input type="number" placeholder="e2" id="e2-2-dim" step="0.5"></td>
+                    <td><input type="number" placeholder="e12" id="e12-2-dim" step="0.5"></td>
+                </tr>
+                <tr>
+                    <td><input type="number" placeholder="0" id="e0-3-dim" step="0.5" readonly></td>
+                    <td><input type="number" placeholder="0" id="e1-3-dim" step="0.5" readonly></td>
+                    <td><input type="number" placeholder="0" id="e2-3-dim" step="0.5" readonly></td>
+                    <td><input type="number" placeholder="0" id="e12-3-dim" step="0.5" readonly></td>
+                </tr>
+            </table>
+        </h3>
+    </div>
+    <!-- <h3>För vanliga vektorer är ologiska</h3> -->
+    <script src="ga200.js"></script>
+    <style>
+        .control{
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+        }
+        h3 {
+            text-align: center;
+        }
+        button:disabled {
+            background-color:rgb(173, 255, 47);
+            color: rgb(82, 0, 208);
+            border-color: black;
+        }
+        math {
+            align-items: center;
+            font-size: 22px;
+            background-color: whitesmoke;
+            padding: 4px;
+            border-radius: 10px;
+        }
+    </style>
+</body>
