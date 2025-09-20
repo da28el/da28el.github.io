@@ -206,7 +206,7 @@ function onMouseClick(evt) {
     }
     if (selectedName === "YES") {
         // redirect
-        window.location.href = "https://da28el.github.io/";
+        window.location.href = "https://da28el.github.io/legacy.html";
     }
     if (selectedName === "NO") {
         animation = "LEGACY2";
