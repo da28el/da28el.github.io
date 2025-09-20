@@ -20,6 +20,9 @@ var vec2 = /** @class */ (function () {
     vec2.prototype.copy = function () {
         return new vec2(this.x, this.y);
     };
+    vec2.prototype.equal = function (v) {
+        return (this.x === v.x) && (this.y === v.y);
+    }
     vec2.add = function (v1, v2) {
         return new vec2(v1.x + v2.x, v1.y + v2.y);
     };
@@ -153,6 +156,8 @@ function startBoundry(evt) {
 }
 function endBoundry(evt) {
     var pos = getMousePos(canvas, evt);
-    boundries.push(new boundry(bp1.copy(), new vec2(pos.x, pos.y)));
+    var v = new vec2(pos.x, pos.y);
+    if (!bp1.equal(v))
+        boundries.push(new boundry(bp1.copy(), v));
 }
 paint();
