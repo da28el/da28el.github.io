@@ -141,7 +141,7 @@ saoPass.params.saoScale = 0.3;
 saoPass.params.saoKernelRadius = 40;
 saoPass.params.saoMinResolution = 0;
 const taaPass = new TAARenderPass(scene, camera);
-taaPass.sampleLevel = 5;
+taaPass.sampleLevel = 3;
 
 const outlinePass = new OutlinePass( new THREE.Vector2( window.innerWidth, window.innerHeight ), scene, camera );
 outlinePass.edgeStrength = 3;
@@ -152,8 +152,8 @@ outlinePass.hiddenEdgeColor.set( new THREE.Color('black') );
 
 const outputPass = new OutputPass();
 composer.addPass(renderPass);
-composer.addPass(saoPass);
-composer.addPass(taaPass);
+// composer.addPass(saoPass);
+// composer.addPass(taaPass);
 composer.addPass(outlinePass);
 composer.addPass(outputPass);
 
