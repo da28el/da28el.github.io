@@ -15,7 +15,8 @@ let interSpeciesMatingRate = 0.001;
 let pMutateConnection = 0.05;
 let pMutateNode = nPopulation < 500 ? 0.03 : 0.3;
 
-const activation = (x) => 1 / (1 + Math.exp(-4.9*x));
+let activation = (x) => Math.tanh(x); //Math.max(0, x); //1 / (1 + Math.exp(-4.9*x));
+let outputActivation = (x) => Math.tanh(x); //1 / (1 + Math.exp(-4.9*x));
 const rand = () => 2 * Math.random() - 1;
 const randInt = (x) => Math.floor(x * Math.random());
 
@@ -309,7 +310,7 @@ const forward = (network, inputs) => {
             sum += neuron.inputs[i].value * neuron.weights[i];
         }
 
-        neuron.nextValue = activation(sum);
+        neuron.nextValue = network.outputs.includes(neuron) ? outputActivation(sum) : activation(sum);
     }
 
     for (let neuron of network.neurons) {
