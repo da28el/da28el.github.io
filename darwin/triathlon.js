@@ -121,33 +121,6 @@ const drawBackground = () => {
     
     ctx.fillStyle = "#6BA";
     ctx.fillRect(0, height * 4/5, width, 20);
-
-    ctx.filter = "blur(1px)";
-    ctx.lineWidth = 8;
-    ctx.strokeStyle = "#fff";
-    ctx.beginPath();
-    ctx.arc(width * 0.2, height * 0.2, 50, 0, 2*Math.PI);
-    ctx.stroke();
-    
-    ctx.fillStyle = "#fff";
-    ctx.font = "italic small-caps bold 20px/2 cursive";
-    ctx.fillText("Håll dig i cirkeln", width * 0.2 + 60, height * 0.2);
-    ctx.font = "italic small-caps bold 16px/2 cursive";
-    ctx.fillText("Kör med A och D", width * 0.2 + 60, height * 0.2 + 20);
-    
-    ctx.filter = "none";
-    ctx.lineWidth = 8;
-    ctx.strokeStyle = "#f00";
-    ctx.beginPath();
-    ctx.arc(width * 0.2, height * 0.2, 50, 0, 2*Math.PI);
-    ctx.stroke();
-    
-    ctx.fillStyle = "#f00";
-    ctx.font = "italic small-caps bold 20px/2 cursive";
-    ctx.fillText("Håll dig i cirkeln", width * 0.2 + 60, height * 0.2);
-    ctx.font = "italic small-caps bold 16px/2 cursive";
-    ctx.fillText("Kör med A och D", width * 0.2 + 60, height * 0.2 + 20);
-
 }
 
 const drawSea = () => {
@@ -305,18 +278,14 @@ const stepRocket = (state) => {
     state[2] = nextState[2] % (2*Math.PI);
     state[3] = nextState[3];
     state[4] = nextState[4];
-    state[5] = nextState[5] * 0.9;
+    state[5] = nextState[5] * 0.99;
     state[6] = 0;
     state[7] = 0;
 
-    // if (state[0] < 0 || state[0] > width) state[0] = (state[0] + width) % width;
     if (state[1] >= height * 4/5) {
         state[1] = Math.min(height * 4/5, state[1]);
-        // state[2] *= 0.8;
         state[3] *= 0.8;
         state[4] = Math.min(0, state[4]);
-        // state[5] *= 0.5;
-
     }
     return state;
 }
@@ -366,74 +335,197 @@ let rocket = State(width/2, height * 3/4, 0, 0, 0, 0);
 let drone = State(width/2, height * 3/4, 0, 0, 0, 0);
 let boat = State(width/2, height - 50, 0, 0, 0, 0);
 
+const drawText = (
+    genIndex, iteration, 
+    targetX, targetY, 
+    userScore, userScoreBest, 
+    aiScores, aiScoreBest
+) => {
+    // player score
+    ctx.fillStyle = "#f00";
+    ctx.font = "italic small-caps bold 24px/2 cursive";
+    ctx.fillText("User Score: " + userScore.toFixed(2), width * 0.025, height * 0.05);
+    ctx.fillText("User Best: " + userScoreBest.toFixed(2), width * 0.25, height * 0.05);
+                
+    if (genIndex > 0) {
+        // ai score
+        ctx.fillStyle = "#f00";
+        ctx.font = "italic small-caps bold 24px/2 cursive";
+        ctx.fillText("AI Score: " + Math.max(...aiScores).toFixed(2), width * 0.025 + 26, height * 0.09);
+        ctx.fillText("AI Best: " + aiScoreBest.toFixed(2), width * 0.25 + 26, height * 0.09);
+    }
+
+    // generation text
+    ctx.fillStyle = "#f00";
+    ctx.font = "italic small-caps bold 24px/2 cursive";
+    ctx.fillText("Generation: " + genIndex, width * 0.8, height * 0.05);
+
+    // generation progress
+    ctx.fillStyle = "#922";
+    ctx.beginPath();
+    ctx.arc(width/2, height * 0.05, 20, 0, 2*Math.PI);
+    ctx.fill();
+    ctx.fillStyle = "#f44";
+    ctx.beginPath();
+    ctx.moveTo(width/2, height * 0.05)
+    ctx.arc(width/2, height * 0.05, 19, -Math.PI/2, 2*Math.PI * iteration / (genIndex === 0 ? 2000 : 1000) - Math.PI/2);
+    ctx.fill();
+
+    // circle background
+    ctx.filter = "blur(1px)";
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = "#fff";
+    ctx.beginPath();
+    ctx.arc(width * targetX, height * targetY, 50, 0, 2*Math.PI);
+    ctx.stroke();
+    ctx.filter = "none"; 
+
+    // circle
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = "#f00";
+    ctx.beginPath();
+    ctx.arc(width * targetX, height * targetY, 50, 0, 2*Math.PI);
+    ctx.stroke();
+
+    // circle text background
+    ctx.fillStyle = "#fff";
+    ctx.font = "italic small-caps bold 20px/2 cursive";
+    ctx.fillText("Håll dig i cirkeln", width * targetX + 60, height * targetY);
+    ctx.font = "italic small-caps bold 16px/2 cursive";
+    ctx.fillText("Kör med W, A och D", width * targetX + 60, height * targetY + 20);
+                
+    // circle text
+    ctx.fillStyle = "#f00";
+    ctx.font = "italic small-caps bold 20px/2 cursive";
+    ctx.fillText("Håll dig i cirkeln", width * targetX + 60, height * targetY);
+    ctx.font = "italic small-caps bold 16px/2 cursive";
+    ctx.fillText("Kör med W, A och D", width * targetX + 60, height * targetY + 20);
+
+    if (genIndex === 0 && iteration > 500) {
+        if (userScore > 10) {
+            ctx.fillStyle = "#ff0";
+            ctx.font = "italic small-caps bold 20px/2 cursive";
+            ctx.fillText("Nu börjar du få till det!", width * 0.6, height * 0.3);
+        } else {
+            ctx.fillStyle = "#ff0";
+            ctx.font = "italic small-caps bold 20px/2 cursive";
+            ctx.fillText("Är det svårart?", width * 0.6, height * 0.3);
+        }
+    }
+
+    if (genIndex === 1) {
+        ctx.fillStyle = "#ff0";
+        ctx.font = "italic small-caps bold 20px/2 cursive";
+        ctx.fillText("Nu tar vi och slänger in några", width * 0.6, height * 0.3);
+        ctx.fillText("neurala nätverk som får styra raketer.", width * 0.6, height * 0.33);
+    }
+    if (genIndex === 2) {
+        ctx.fillStyle = "#ff0";
+        ctx.font = "italic small-caps bold 20px/2 cursive";
+        ctx.fillText("Som du kanske märker är dom", width * 0.6, height * 0.3);
+        ctx.fillText("inte särskilt duktiga än...", width * 0.6, height * 0.33);
+    }
+    if (genIndex === 3) {
+        ctx.fillStyle = "#ff0";
+        ctx.font = "italic small-caps bold 20px/2 cursive";
+        ctx.fillText("Dom behöver lite tid för", width * 0.6, height * 0.3);
+        ctx.fillText("att lära sig.", width * 0.6, height * 0.33);
+    }
+    if (genIndex === 4) {
+        ctx.fillStyle = "#ff0";
+        ctx.font = "italic small-caps bold 20px/2 cursive";
+        ctx.fillText("Du kan lära dig medan du spelar,", width * 0.6, height * 0.3);
+        ctx.fillText("men nätverken lär sig bara ", width * 0.6, height * 0.33);
+        ctx.fillText("mellan generationer.", width * 0.6, height * 0.36);
+    }
+    if (genIndex === 5) {
+        ctx.fillStyle = "#ff0";
+        ctx.font = "italic small-caps bold 20px/2 cursive";
+        ctx.fillText("Du märker ju att den försöker,", width * 0.6, height * 0.3);
+        ctx.fillText("men det ser ju inte ut att vara", width * 0.6, height * 0.33);
+        ctx.fillText("någon större utmaning att vinna.", width * 0.6, height * 0.36);
+    }
+    if (genIndex === 6) {
+        ctx.fillStyle = "#ff0";
+        ctx.font = "italic small-caps bold 20px/2 cursive";
+        ctx.fillText("Här är en raket tränad över 3000", width * 0.6, height * 0.3);
+        ctx.fillText("generationer. Se om det är lika", width * 0.6, height * 0.33);
+        ctx.fillText("lätt nu då.", width * 0.6, height * 0.36);
+    }
+    if (genIndex === 7) {
+        ctx.fillStyle = "#ff0";
+        ctx.font = "italic small-caps bold 20px/2 cursive";
+        ctx.fillText("Nu märker du att den har blivit", width * 0.6, height * 0.3);
+        ctx.fillText("betydligt bättre, näst intill", width * 0.6, height * 0.33);
+        ctx.fillText("optimal.", width * 0.6, height * 0.36);
+    }
+    if (genIndex === 8) {
+        ctx.fillStyle = "#ff0";
+        ctx.font = "italic small-caps bold 20px/2 cursive";
+        ctx.fillText("Nästa ", width * 0.6, height * 0.3);
+        ctx.fillText("betydligt bättre, näst intill", width * 0.6, height * 0.33);
+        ctx.fillText("optimal.", width * 0.6, height * 0.36);
+    }
+}
+
 function main() {
-    nPopulation = 100;
+    let bestFitness = 0;
+    let bestFitnessGen = 0;
+    nPopulation = 10;
     const nSensors = 8;
     const nOutputs = 2;
     innov = nSensors * nOutputs;
+    const pretrained = {"nodeGenes":[{"node":1,"type":"sensor"},{"node":2,"type":"sensor"},{"node":3,"type":"sensor"},{"node":4,"type":"sensor"},{"node":5,"type":"sensor"},{"node":6,"type":"sensor"},{"node":7,"type":"sensor"},{"node":8,"type":"sensor"},{"node":9,"type":"output"},{"node":10,"type":"output"},{"node":11,"type":"hidden"},{"node":12,"type":"hidden"},{"node":13,"type":"hidden"},{"node":14,"type":"hidden"},{"node":15,"type":"hidden"},{"node":16,"type":"hidden"},{"node":17,"type":"hidden"},{"node":18,"type":"hidden"},{"node":19,"type":"hidden"}],"connectionGenes":[{"input":1,"output":9,"weight":0.8035326728370898,"enabled":false,"innov":16},{"input":2,"output":9,"weight":-0.2548470251044446,"enabled":false,"innov":17},{"input":3,"output":9,"weight":-0.2591046699570672,"enabled":false,"innov":18},{"input":4,"output":9,"weight":-0.1426177345486614,"enabled":false,"innov":19},{"input":5,"output":9,"weight":-0.9217611428200423,"enabled":false,"innov":20},{"input":6,"output":9,"weight":-0.8760100122047209,"enabled":false,"innov":21},{"input":15,"output":18,"weight":1,"enabled":true,"innov":22},{"input":8,"output":9,"weight":0.5234811337624071,"enabled":false,"innov":23},{"input":1,"output":10,"weight":0.8755051244703248,"enabled":false,"innov":24},{"input":2,"output":10,"weight":-0.5556298499603105,"enabled":false,"innov":25},{"input":3,"output":10,"weight":0.582716613739905,"enabled":false,"innov":26},{"input":4,"output":10,"weight":-0.5536168053607677,"enabled":true,"innov":27},{"input":5,"output":10,"weight":-1.1226999581368469,"enabled":true,"innov":28},{"input":6,"output":10,"weight":0.8682769278802058,"enabled":true,"innov":29},{"input":7,"output":10,"weight":-1.1820941789002586,"enabled":true,"innov":30},{"input":14,"output":16,"weight":0.05600749357569686,"enabled":true,"innov":31},{"input":1,"output":14,"weight":0.04767505523731526,"enabled":true,"innov":32},{"input":2,"output":11,"weight":0.1849022901993649,"enabled":false,"innov":34},{"input":11,"output":9,"weight":0.8213127109089741,"enabled":false,"innov":35},{"input":3,"output":11,"weight":0.4915368619314756,"enabled":false,"innov":36},{"input":6,"output":11,"weight":-0.26940675181966084,"enabled":true,"innov":38},{"input":8,"output":11,"weight":-0.05199817797744362,"enabled":false,"innov":39},{"input":18,"output":16,"weight":-0.0709117637384067,"enabled":true,"innov":46},{"input":17,"output":10,"weight":-0.17087030161839034,"enabled":true,"innov":47},{"input":5,"output":12,"weight":-0.365429219484437,"enabled":false,"innov":48},{"input":1,"output":12,"weight":0.6342945090269575,"enabled":true,"innov":49},{"input":2,"output":13,"weight":1.04566500848017,"enabled":true,"innov":55},{"input":13,"output":9,"weight":-0.8346580918098532,"enabled":false,"innov":56},{"input":11,"output":12,"weight":0.464785803970637,"enabled":true,"innov":57},{"input":10,"output":12,"weight":-0.9079849164311204,"enabled":true,"innov":62},{"input":7,"output":13,"weight":0.7081829825629439,"enabled":false,"innov":71},{"input":14,"output":9,"weight":1.0180670672352454,"enabled":true,"innov":76},{"input":10,"output":13,"weight":0.10179524721334995,"enabled":true,"innov":77},{"input":10,"output":14,"weight":0.09465166953653298,"enabled":true,"innov":78},{"input":13,"output":14,"weight":1.5152034468875832,"enabled":true,"innov":79},{"input":14,"output":10,"weight":-0.04306012822085412,"enabled":true,"innov":82},{"input":17,"output":16,"weight":-0.4558035622419472,"enabled":true,"innov":84},{"input":16,"output":15,"weight":-0.03286464605723056,"enabled":false,"innov":86},{"input":4,"output":18,"weight":1,"enabled":true,"innov":91},{"input":5,"output":16,"weight":0.6318399970648944,"enabled":true,"innov":92},{"input":15,"output":10,"weight":0.20793651451763973,"enabled":true,"innov":95},{"input":4,"output":15,"weight":-0.21197911175639034,"enabled":false,"innov":110},{"input":15,"output":17,"weight":-0.06932901162459149,"enabled":false,"innov":111},{"input":16,"output":9,"weight":0.9617271002516291,"enabled":true,"innov":119},{"input":13,"output":16,"weight":0.8672063425427642,"enabled":true,"innov":121},{"input":4,"output":16,"weight":-0.0709117637384067,"enabled":false,"innov":124},{"input":15,"output":16,"weight":0.6036747234584555,"enabled":true,"innov":133},{"input":17,"output":13,"weight":0.0517158555746338,"enabled":true,"innov":148},{"input":7,"output":17,"weight":-0.2373060739543428,"enabled":true,"innov":161},{"input":16,"output":19,"weight":1,"enabled":true,"innov":27},{"input":19,"output":15,"weight":-0.03286464605723056,"enabled":true,"innov":28}]}
     let population = Array(nPopulation).fill(null).map(() => Genome(nSensors, nOutputs));
+    innov = Math.max(...population.map(p => p.connectionGenes.innov), innov) + 1;
     let speciesList = [];
     let nextSpeciesId = 1;
+
+    let targetX = 0.2;
+    let targetY = 0.2;
 
     let userScore = 0;
     let userScoreBest = 0;
     let aiScores = Array(nPopulation).fill(0);
     let aiScoreBest = 0;
 
-    const cost = (state) => {
-        let angle = state[2] % (2 * Math.PI);
-        if (angle > Math.PI) angle -= 2 * Math.PI;
-        else if (angle < -Math.PI) angle += 2 * Math.PI;
-    
-        return angle**2 + (state[0]/width - 0.2)**2 + (state[1]/height - 0.2)**2 + (0.5 * state[5]**2);
-    }
-
     async function runGeneration(genIndex) {
+        if (genIndex === 6) {
+            population = population.map(() => clone(pretrained));
+            speciesList = [];
+        }
+
         const agents = Array(nPopulation).fill(null).map((v, i) => State(width/2, height * 3/4, 0, 0, 0, 0));
         const networks = population.map(genome => incubate(genome));
-        let costs = Array(nPopulation).fill(0);
+
+        let bestDistance = Array(nPopulation).fill(Infinity);
+        let timeOnTarget = Array(nPopulation).fill(0);
+        let alive = Array(nPopulation).fill(true);
+
         let iteration = 0;
 
         userScore = 0;
+        if (genIndex === 1) userScoreBest = 0;
         aiScores = aiScores.fill(0);
 
         rocket = State(width/2, height * 3/4, 0, 0, 0, 0);
         
         await new Promise(resolve => {
-            function loop1() {
+            function loop() {
                 iteration++;
+
                 drawBackground();
                 
-                ctx.fillStyle = "#f00";
-                ctx.font = "italic small-caps bold 24px/2 cursive";
-                ctx.fillText("User Score: " + userScore.toFixed(2), width * 0.025, height * 0.05);
-                ctx.fillText("User Best: " + userScoreBest.toFixed(2), width * 0.25, height * 0.05);
-
-                ctx.fillStyle = "#f00";
-                ctx.font = "italic small-caps bold 24px/2 cursive";
-                ctx.fillText("AI Score: " + Math.max(...aiScores).toFixed(2), width * 0.025 + 26, height * 0.09);
-                ctx.fillText("AI Best: " + aiScoreBest.toFixed(2), width * 0.25 + 26, height * 0.09);
-
-
-                ctx.fillStyle = "#f00";
-                ctx.font = "italic small-caps bold 24px/2 cursive";
-                ctx.fillText("Generation: " + (genIndex + 1), width * 0.8, height * 0.05);
+                drawText(genIndex, iteration, targetX, targetY, userScore, userScoreBest, aiScores, aiScoreBest);
                 
-                ctx.fillStyle = "#922";
-                ctx.beginPath();
-                ctx.arc(width/2, height * 0.05, 20, 0, 2*Math.PI);
-                ctx.fill();
-                ctx.fillStyle = "#f44";
-                ctx.beginPath();
-                ctx.moveTo(width/2, height * 0.05)
-                ctx.arc(width/2, height * 0.05, 19, -Math.PI/2, 2*Math.PI * iteration / 1000 - Math.PI/2);
-                ctx.fill();
 
-                for (let i = 0; i < nPopulation; i++) {
+                for (let i = 0; i < nPopulation && genIndex > 0; i++) {
+                    if (!alive[i]) continue;
+
                     const agent = agents[i];
                     let F = forward(networks[i], [
-                        agent[0] / width,
-                        agent[1] / height,
+                        agent[0] / width - targetX,
+                        agent[1] / height - targetY,
                         Math.cos(agent[2]),
                         Math.sin(agent[2]),
                         agent[3] / 20.0,
@@ -442,43 +534,65 @@ function main() {
                         1.0,
                     ]);
                     agent[6] = 10 * (F[0] + 1);
-                    agent[7] = F[1];
+                    agent[7] = F[1] * 10;
                     drawRocket(agent);
 
                     agents[i] = stepRocket(agents[i]);
 
-                    costs[i] += cost(agent);
-                    
-                    const r_2 = (agent[0] - width * 0.2)**2 + (agent[1] - height * 0.2)**2;
+                    if (agent[0] < -100 || agent[0] > width + 100 || agent[1] < -100) {
+                        alive[i] = false;
+                        continue;
+                    }
+
+                    const distanceToTarget = Math.hypot(agent[0]/width - targetX, agent[1]/height - targetY);
+                    if (distanceToTarget < bestDistance[i]) {
+                        bestDistance[i] = distanceToTarget;
+                    }
+
+                    if (distanceToTarget < 0.05) {
+                        let angleError = Math.abs(agent[2] % (2 * Math.PI));
+                        if (angleError > Math.PI) angleError -= 2 * Math.PI;
+
+                        let stabilityPenalty = (agent[3]**2 + agent[4]**2) * 0.1 + Math.abs(angleError);
+                        timeOnTarget[i] += dt / (1 + stabilityPenalty);
+                    }
+
+                    const r_2 = (agent[0] - width * targetX)**2 + (agent[1] - height * targetY)**2;
                     if (r_2 <= 50**2)
                         aiScores[i] += dt;
                 }
 
-                userScoreBest = Math.max(userScoreBest, userScore);
-                aiScoreBest = Math.max(aiScoreBest, Math.max(...aiScores));
-
-                costs = costs.map((v, i) => (v * (1 - aiScores[i] / 1000)));
-
                 rocket = inputRocket(rocket);
                 drawRocket(rocket, true);
                 rocket = stepRocket(rocket);
+                if (rocket[0] < 0 || rocket[0] > width) rocket[0] = (rocket[0] + width) % width;
 
-                const r_2 = (rocket[0] - width * 0.2)**2 + (rocket[1] - height * 0.2)**2;
+                const r_2 = (rocket[0] - width * targetX)**2 + (rocket[1] - height * targetY)**2;
                 if (r_2 <= 50**2)
                     userScore += dt;
 
-                if (iteration < 1000)
-                        requestAnimationFrame(loop1);
+                userScoreBest = Math.max(userScore, userScoreBest);
+                aiScoreBest = Math.max(Math.max(...aiScores), aiScoreBest);
+
+                if (iteration < 1000 || (genIndex === 0 && iteration < 2000))
+                        requestAnimationFrame(loop);
                 else
                     resolve();
             }
-            loop1();
+            loop();
         });
 
         const specimens = population.map((genome, idx) => {
-            const fitness = 1 / (costs[idx] + 1);
+            const fitness = (1 + timeOnTarget[idx]) / (bestDistance[idx] + 0.01);
             return {genome, fitness, adjustedFitness: fitness};
         });
+
+        let sortedSpecimens = specimens.sort((a, b) => b.fitness - a.fitness);
+        
+        if (sortedSpecimens[0].fitness > bestFitness) {
+            bestFitness = sortedSpecimens[0].fitness;
+            bestFitnessGen = genIndex;
+        }
 
         [speciesList, nextSpeciesId] = speciatePopulation(specimens, speciesList, nextSpeciesId);
         population = reproducePopulation(speciesList);
@@ -486,6 +600,6 @@ function main() {
         runGeneration(genIndex + 1);
     }
 
-    runGeneration(0);
+    runGeneration(5);
 }
 main();
