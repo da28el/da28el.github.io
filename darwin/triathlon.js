@@ -600,6 +600,6 @@ function main() {
         runGeneration(genIndex + 1);
     }
 
-    runGeneration(5);
+    runGeneration(0);
 }
 main();
