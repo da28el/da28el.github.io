@@ -1,19 +1,22 @@
 // neat.js
 
-let innov = 1;
-let nPopulation = 150;
-let c1 = 1.0, 
-    c2 = 1.0, 
-    c3 = 0.4;
-let compatabilityThreshold = 3.0;
-let stagnationLimit = 15;
-let championSpeciesLimit = 5;
-let pMutateWeight = 0.8;
-let pMutateWeightRandom = 0.1;
-let pInheritDisabled = 0.75;
-let interSpeciesMatingRate = 0.001;
-let pMutateConnection = 0.05;
+let nPopulation =               150;
+let c1 =                        1.0;
+let c2 =                        1.0;
+let c3 =                        0.4;
+let compatabilityThreshold =    3.0;
+let stagnationLimit =           15;
+let championSpeciesLimit =      5;
+let pMutateWeight =             0.8;
+let pMutateWeightRandom =       0.1;
+let pInheritDisabled =          0.75;
+let interSpeciesMatingRate =    0.001;
+let pMutateConnection =         0.05;
 let pMutateNode = nPopulation < 500 ? 0.03 : 0.3;
+
+let innov = 1;
+let innovTable = new Map();
+
 
 let activation = (x) => Math.tanh(x); //Math.max(0, x); //1 / (1 + Math.exp(-4.9*x));
 let outputActivation = (x) => Math.tanh(x); //1 / (1 + Math.exp(-4.9*x));
@@ -34,12 +37,19 @@ const ConnectionGene = (input, output, weight, enabled, innov) => ({
     input: input, output: output, weight: weight, enabled: enabled, innov: innov
 })
 
+const innovation = (input, output) => {
+    const key = `${input}->${output}`;
+    if (!innovTable.has(key)) {
+        innovTable.set(key, innov++);
+    }
+    return innovTable.get(key);
+}
+
 const Genome = (nInput, nOutput) => {
     let nodeGenes = [];
     for (let i = 0; i < nInput + nOutput; i++) {
         nodeGenes.push(NodeGene(i + 1, i < nInput ? NODE_TYPE.SENSOR : NODE_TYPE.OUTPUT));
     }
-    let localInnov = 1;
     let connectionGenes = [];
     for (let i = 0; i < nInput + nOutput; i++) {
         let node1 = nodeGenes[i];
@@ -48,7 +58,7 @@ const Genome = (nInput, nOutput) => {
                 let node2 = nodeGenes[j];
                 if (node2.type == NODE_TYPE.SENSOR) {
                     connectionGenes.push(
-                        ConnectionGene(node2.node, node1.node, rand(), true, localInnov++)
+                        ConnectionGene(node2.node, node1.node, rand(), true, innovation(node2.node, node1.node))
                     );
                 }
             }
@@ -88,18 +98,19 @@ const mutateAddConnection = (genome) => {
                 if (connection.input === n2.node && connection.output === n1.node) exists = true; 
             }
             if (exists) continue;
-            let connection = ConnectionGene(n2.node, n1.node, rand(), true, innov + 1);
+            let connection = ConnectionGene(n2.node, n1.node, 0.1 * rand(), true, 0);
             possibleConnections.push(connection);
         }
     }
 
     if (!possibleConnections.length) return genome;
     
-    innov++;
+    const newConnection = possibleConnections[
+        randInt(possibleConnections.length)
+    ];
+    newConnection.innov = innovation(newConnection.input, newConnection.output);
     genome.connectionGenes.push(
-        possibleConnections[
-            randInt(possibleConnections.length)
-        ]
+        newConnection
     );
 
     return genome;
@@ -109,26 +120,26 @@ const mutateAddNode = (genome) => {
     const node = genome.nodeGenes.length + 1;
     let gene = NodeGene(node, NODE_TYPE.HIDDEN);
     genome.nodeGenes.push(gene);
-    let nConnections = genome.connectionGenes.length;
-    let connection = null;
-    do {
-        connection = genome.connectionGenes[randInt(nConnections)];
-    } while (!connection.enabled);
+    let enabledConnections = genome.connectionGenes.filter(cg => cg.enabled);
+    let nConnections = enabledConnections.length;
+    
+    if (nConnections === 0) return genome;
+    
+    let connection = enabledConnections[randInt(nConnections)];
 
-    let connection1 = ConnectionGene(connection.input, node, rand(), true, innov + 1);
-    let connection2 = ConnectionGene(node, connection.output, rand(), true, innov + 2);
+    let connection1 = ConnectionGene(connection.input, node, 1.0, true, innovation(connection.input, node));
+    let connection2 = ConnectionGene(node, connection.output, connection.weight, true, innovation(node, connection.output));
 
     connection.enabled = false;
 
     genome.connectionGenes.push(connection1, connection2);
-    innov += 2;
 
     return genome;
 }
 
 const mutation = (genome) => {
     if (Math.random() < pMutateWeight) {
-        for (cg of genome.connectionGenes){
+        for (let cg of genome.connectionGenes){
             if (Math.random() < pMutateWeightRandom) {
                 cg.weight = rand();
             } else {
@@ -144,11 +155,15 @@ const mutation = (genome) => {
     }
 }
 
-const crossover = (g1, g2) => {
+const crossover = (g1, g2, f1, f2) => {
     let offspring = Genome(0, 0);
     
-    const parentNodes = g1.nodeGenes.length > g2.nodeGenes.length ? g1.nodeGenes : g2.nodeGenes;
-    offspring.nodeGenes = parentNodes.map((ng, i) => NodeGene(i + 1, ng.type));
+    const parentNodes = f1 > f2 ? g1.nodeGenes : 
+                        f2 > f1 ? g2.nodeGenes : 
+                        g1.nodeGenes.length > g2.nodeGenes.length ? 
+                        g1.nodeGenes : g2.nodeGenes;
+
+    offspring.nodeGenes = parentNodes.map((ng, i) => NodeGene(ng.node, ng.type));
 
 
     const nConnections1 = g1.connectionGenes.length;
@@ -176,8 +191,12 @@ const crossover = (g1, g2) => {
                 selected = Math.random() < 0.5 ? gene1 : gene2;
 
         } else {
-            selected = gene1 || gene2;
+            if (f1 > f2 && gene1) selected = gene1;
+            else if (f2 > f1 && gene2) selected = gene2;
+            else if (f1 === f2) selected = gene1 || gene2;
         }
+
+        if (!selected) continue;
 
         offspring.connectionGenes.push(
             ConnectionGene(selected.input, selected.output, selected.weight, selected.enabled, selected.innov)
@@ -198,8 +217,8 @@ const distance = (g1, g2) => {
 
     const sortedInnovs = Array.from(geneMap.keys()).sort((a, b) => a - b);
 
-    const maxInnov1 = g1.connectionGenes.reduce((p, c) => p = Math.max(p || 0, c.innov));
-    const maxInnov2 = g2.connectionGenes.reduce((p, c) => p = Math.max(p || 0, c.innov));
+    const maxInnov1 = g1.connectionGenes.reduce((p, c) => p = Math.max(p, c.innov), 0);
+    const maxInnov2 = g2.connectionGenes.reduce((p, c) => p = Math.max(p, c.innov), 0);
 
     let E = 0, D = 0, W = 0, N = 1;
     let Wn = 0;
@@ -277,18 +296,24 @@ const Neuron = () => ({
 const incubate = (genome) => {
     let inputs = [];
     let outputs = [];
+    let neuronMap = new Map();
     let neurons = [];
+
     for (let ng of genome.nodeGenes) {
         let n = Neuron();
-        neurons.push(n);
+        neuronMap.set(ng.node, n);
         if (ng.type === NODE_TYPE.SENSOR) inputs.push(n)
         if (ng.type === NODE_TYPE.OUTPUT) outputs.push(n); 
     }
         
     for (let cg of genome.connectionGenes) {
         if (!cg.enabled) continue;
-        let n_out = neurons[cg.output - 1];
-        let n_in = neurons[cg.input - 1];
+
+        let n_out = neuronMap.get(cg.output);
+        let n_in = neuronMap.get(cg.input);
+        
+        if (!n_out || !n_in) continue;
+        
         n_out.inputs.push(n_in);
         n_out.weights.push(cg.weight);
     }
@@ -296,7 +321,7 @@ const incubate = (genome) => {
     return {
         inputs: inputs,
         outputs: outputs,
-        neurons: neurons
+        neurons: Array.from(neuronMap.values())
     };
 }
 
@@ -304,19 +329,26 @@ const forward = (network, inputs) => {
     
     network.inputs.map((v, i) => v.value = inputs[i]);
 
-    for (let neuron of network.neurons) {
-        let sum = 0;
-        for (let i = 0; i < neuron.inputs.length; i++) {
-            sum += neuron.inputs[i].value * neuron.weights[i];
+    const NETWORK_MAX_DEPTH = 3;
+
+    for (let d = 0; d < NETWORK_MAX_DEPTH; d++) {
+
+        for (let neuron of network.neurons) {
+            let sum = 0;
+            for (let i = 0; i < neuron.inputs.length; i++) {
+                sum += neuron.inputs[i].value * neuron.weights[i];
+            }
+            
+            neuron.nextValue = network.outputs.includes(neuron) ? outputActivation(sum) : activation(sum);
+        }
+        
+        for (let neuron of network.neurons) {
+            if (network.inputs.includes(neuron)) continue;
+            neuron.value = neuron.nextValue;
         }
 
-        neuron.nextValue = network.outputs.includes(neuron) ? outputActivation(sum) : activation(sum);
     }
 
-    for (let neuron of network.neurons) {
-        if (network.inputs.includes(neuron)) continue;
-        neuron.value = neuron.nextValue;
-    }
     return network.outputs.map(out => out.value);
 }
 
@@ -324,6 +356,8 @@ const speciatePopulation = (specimens, speciesList, nextSpeciesId) => {
 
     // reset members
     for (let s of speciesList) {
+        const randomMember = s.members[randInt(s.members.length)];
+        s.representative = clone(randomMember.genome);
         s.members = [];
     }
 
@@ -370,6 +404,7 @@ const speciatePopulation = (specimens, speciesList, nextSpeciesId) => {
         } else {
             s.stagnationCounter++;
         }
+
         s.age++;
     }
 
@@ -416,9 +451,9 @@ const reproducePopulation = (speciesList) => {
 
             if (breedingPool.length > 1 && Math.random() > 0.25) {
                 // sexual reproduction
-                let p1 = breedingPool[randInt(breedingPool.length)].genome;
-                let p2 = breedingPool[randInt(breedingPool.length)].genome;
-                child = crossover(p1, p2);
+                let p1 = breedingPool[randInt(breedingPool.length)];
+                let p2 = breedingPool[randInt(breedingPool.length)];
+                child = crossover(p1.genome, p2.genome, p1.fitness, p2.fitness);
             } else {
                 // asexual reproduction
                 child = clone(breedingPool[randInt(breedingPool.length)].genome);
@@ -428,6 +463,9 @@ const reproducePopulation = (speciesList) => {
             nextGeneration.push(child);
         }
     }
+
+    speciesList.sort((a, b) => b.bestFitness - a.bestFitness);
+    speciesList[0].members.sort((a, b) => b.fitness - a.fitness)
 
     while (nextGeneration.length < nPopulation) {
         nextGeneration.push(clone(speciesList[0].members[0].genome));
@@ -474,4 +512,42 @@ const simulate = (nSensors, nOutputs, taskCallback, generations = 1000) => {
     // printGenome(population[0])
     console.log("evaluation:", taskCallback(incubate(population[0]), true));
     return population[0];
+}
+
+const NEAT = {
+    get nPopulation() {return nPopulation},
+    set nPopulation(v) {nPopulation = v},
+    get innov() {return innov},
+    set innov(v) {innov = v},
+    get innovTable() {return innovTable},
+    activation,
+    outputActivation,
+    rand,
+    randInt,
+    NODE_TYPE,
+    NodeGene,
+    ConnectionGene,
+    innovation,
+    Genome,
+    clone,
+    mutateAddConnection,
+    mutateAddNode,
+    mutation,
+    crossover,
+    distance,
+    sh,
+    adjustedFitness,
+    printGenome,
+    Neuron,
+    incubate,
+    forward,
+    speciatePopulation,
+    reproducePopulation,
+    simulate,
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = NEAT; // node
+} else {
+    window.NEAT = NEAT; // browser
 }
