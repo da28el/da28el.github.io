@@ -46,14 +46,6 @@ const State = (x, y, t, xd, yd, td) => [
     x, y, t, xd, yd, td, 0, 0
 ]
 
-const f_rocket = (state) => {
-    let [x, y, t, xd, yd, td, F, T] = state;
-    let xdd = F * Math.cos(t - Math.PI/2) / m;
-    let ydd = F * Math.sin(t - Math.PI/2) / m - g;
-    let tdd = T / m;
-    return State(xd, yd, td, xdd, ydd, tdd);
-}
-
 const f_drone = (state) => {
     let [x, y, t, xd, yd, td, F1, F2] = state;
     let xdd = (F1 + F2) * Math.cos(t - Math.PI/2) / m;
@@ -91,16 +83,10 @@ function rk4(y, dt, f) {
     return add(y, mul(dt/6, add(add(add(k1, mul(2, k2)), mul(2, k3)), k4)));
 }
 
-const inputRocket = (state) => {
-    if (Key.isDown(Key.W)) state[6] += 20;
-    if (Key.isDown(Key.A)) state[7] -= 1;
-    if (Key.isDown(Key.D)) state[7] += 1;
-    return state;
-}
 
 const inputDrone = (state) => {
-    if (Key.isDown(Key.A)) state[6] += 1500;
-    if (Key.isDown(Key.D)) state[7] += 1500;
+    if (Key.isDown(Key.A)) state[6] += 10;
+    if (Key.isDown(Key.D)) state[7] += 10;
     return state;
 }
 
@@ -133,52 +119,6 @@ const drawSea = () => {
     ctx.fillStyle = "#bbb";
     ctx.fillRect(0, height - 22, width, 4); 
     ctx.filter = "none";
-}
-
-const drawRocket = (state, player) => {
-    ctx.translate(...state.slice(0, 2));
-    ctx.rotate(state[2] - Math.PI/2);
-    if (player) {
-        ctx.fillStyle = "#fff";
-        ctx.fillRect(-21, -11, 42, 22);
-        ctx.beginPath();
-        ctx.moveTo(21, -11);
-        ctx.lineTo(31, 0);
-        ctx.lineTo(21, 11);
-        ctx.fill();
-    }
-    ctx.fillStyle = `rgba(102, 102, 102, ${player ? 1.0 : 0.2})`;
-    ctx.fillRect(-20, -10, 40, 20);
-    ctx.beginPath();
-    ctx.moveTo(20, -10);
-    ctx.lineTo(30, 0);
-    ctx.lineTo(20, 10);
-    ctx.fill();
-    if (state[6] === 0) {
-        ctx.resetTransform();
-        return;
-    }
-    ctx.filter = "blur(2px)";
-    ctx.fillStyle = `rgba(221, 85, 85, ${player ? 1.0 : 0.2})`;
-    ctx.beginPath();
-    ctx.moveTo(-20, -10);
-    ctx.lineTo(-40, 0);
-    ctx.lineTo(-20, 10);
-    ctx.fill();
-    ctx.fillStyle = `rgba(238, 102, 102, ${player ? 1.0 : 0.2})`;
-    ctx.beginPath();
-    ctx.moveTo(-20, -8);
-    ctx.lineTo(-35, 0);
-    ctx.lineTo(-20, 8);
-    ctx.fill();
-    ctx.fillStyle = `rgba(255, 119, 119, ${player ? 1.0 : 0.2})`;
-    ctx.beginPath();
-    ctx.moveTo(-20, -5);
-    ctx.lineTo(-30, 0);
-    ctx.lineTo(-20, 5);
-    ctx.fill();
-    ctx.filter = "none";
-    ctx.resetTransform();
 }
 
 const drawDrone = (state) => {
@@ -271,8 +211,8 @@ const drawBoat = (state) => {
     ctx.stroke();
 }
 
-const stepRocket = (state) => {
-    const nextState = rk4(state, dt, f_rocket);
+const stepDrone = (state) => {
+    const nextState = rk4(state, dt, f_drone);
     state[0] = nextState[0];
     state[1] = nextState[1];
     state[2] = nextState[2] % (2*Math.PI);
@@ -282,33 +222,11 @@ const stepRocket = (state) => {
     state[6] = 0;
     state[7] = 0;
 
-    if (state[1] >= height * 4/5) {
+    if (state[0] < 0 || state[0] > width) state[0] = (state[0] + width) % width;
+    if (state[1] > height * 4/5) {
         state[1] = Math.min(height * 4/5, state[1]);
         state[3] *= 0.8;
         state[4] = Math.min(0, state[4]);
-    }
-    return state;
-}
-
-const stepDrone = (state) => {
-    const nextState = rk4(state, dt, f_drone);
-    state[0] = nextState[0];
-    state[1] = nextState[1];
-    state[2] = nextState[2] % (2*Math.PI);
-    state[3] = nextState[3];
-    state[4] = nextState[4];
-    state[5] = nextState[5];
-    state[6] = 0;
-    state[7] = 0;
-
-    if (state[0] < 0 || state[0] > width) state[0] = (state[0] + width) % width;
-    if (state[1] > height * 4/5) {
-        state[1] = height * 4/5;
-        state[2] *= 0.95;
-        state[3] *= 0.9;
-        state[4] = Math.min(0, state[4]);
-        state[5] *= 0.9;
-        userScore = 0;
     }
     return state;
 }
@@ -330,10 +248,6 @@ const stepBoat = (state) => {
     nextState[7] = 0;
     return nextState;
 }
-
-let rocket = State(width/2, height * 3/4, 0, 0, 0, 0);
-let drone = State(width/2, height * 3/4, 0, 0, 0, 0);
-let boat = State(width/2, height - 50, 0, 0, 0, 0);
 
 const drawText = (
     genIndex, iteration, 
@@ -470,10 +384,27 @@ const drawText = (
     }
 }
 
+let drone = State(width/2, height * 3/4, 0, 0, 0, 0);
+let boat = State(width/2, height - 50, 0, 0, 0, 0);
+let car = State(width/2, height / 2, 0, 0, 0, 0); 
+function demo() {
+    // drawBackground();
+    // drone = inputDrone(drone);
+    // drawDrone(drone);
+    // stepDrone(drone);
+
+    drawSea();
+    boat = inputBoat(boat);
+    drawBoat(boat);
+    stepBoat(boat);
+
+    requestAnimationFrame(demo);
+} demo();
+
 function main() {
     let bestFitness = 0;
     let bestFitnessGen = 0;
-    nPopulation = 20;
+    nPopulation = 200;
     const nSensors = 8;
     const nOutputs = 2;
     innov = nSensors * nOutputs;
@@ -604,4 +535,4 @@ function main() {
 
     runGeneration(0);
 }
-main();
+// main();
