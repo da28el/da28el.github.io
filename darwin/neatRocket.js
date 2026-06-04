@@ -467,14 +467,13 @@ const drawText = (
         ctx.fillText("och nätverken kan lära sig har", width * 0.6, height * 0.36);
         ctx.fillText("jag många fler planer och tester.", width * 0.6, height * 0.39);
         ctx.fillText("Ha det bra tills dess.", width * 0.6, height * 0.42);
-        ctx.fillText("Natti natti <3", width * 0.6, height * 0.45);
     }
 }
 
 function main() {
     let bestFitness = 0;
     let bestFitnessGen = 0;
-    nPopulation = 10;
+    nPopulation = 200;
     const nSensors = 8;
     const nOutputs = 2;
     innov = nSensors * nOutputs;
